@@ -4,7 +4,6 @@ import java.util.Vector;
 import static java.nio.file.StandardWatchEventKinds.*;
 import java.io.IOException;
 import java.io.File;
-import java.net.InetAddress;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -223,6 +222,6 @@ public class DirectoryWatcher extends Watcher {
     	directoriesToWatch.add( Paths.get("/home/"+ usernameEtudiant +"/flicage_tp/") );
     	directoriesToWatch.add( Paths.get("/home/"+ usernameEtudiant +"/Téléchargements/") );
     	
-        new DirectoryWatcher(directoriesToWatch).run();
+        new DirectoryWatcher(directoriesToWatch).start();
     }
 }
