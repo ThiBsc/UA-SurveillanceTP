@@ -2,5 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/etudiant/flicage_tp/surveillanceTP/vidéo/xuggle-xuggler-5.4.jar"/>
+	<classpathentry kind="lib" path="/home/etudiant/flicage_tp/surveillanceTP/vidéo/slf4j-1.7.25/slf4j-nop-1.7.25.jar"/>
+	<classpathentry kind="lib" path="/home/etudiant/flicage_tp/surveillanceTP/vidéo/slf4j-1.7.25/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="/home/etudiant/flicage_tp/surveillanceTP/vidéo/logback-1.2.3/logback-access-1.2.3.jar"/>
+	<classpathentry kind="lib" path="/home/etudiant/flicage_tp/surveillanceTP/vidéo/commons-lang3-3.6/commons-lang3-3.6.jar"/>
+	<classpathentry kind="lib" path="/home/etudiant/flicage_tp/surveillanceTP/vidéo/commons-cli-1.4/commons-cli-1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
