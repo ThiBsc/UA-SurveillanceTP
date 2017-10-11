@@ -37,6 +37,11 @@ public class DirectoryWatcher extends Watcher {
 	 * On fait un vector de Path et non plus de String pour faciliter les appels aux fonctions
 	 */
 	private Vector<Path> directoryList;
+	
+	private Vector<String> changeTypes;
+	private Vector<String> changePaths;
+	private Vector<String> changeSizes;
+	private Vector<String> changeTimes;
 	 
 	/**
 	 * ===========================================================================
@@ -98,12 +103,12 @@ public class DirectoryWatcher extends Watcher {
  
 	/**
 	 * ===========================================================================
-	 * Déclaration de la façon de watcher les dossiers et leurs sous-dossiers
+	 * Fonctions diverses
 	 * ===========================================================================
 	 */
 	
     /**
-     * Register the given directory with the WatchService; This function will be called by FileVisitor
+     * cf walkAndRegisterDirectories
      */
     private void registerDirectory(Path dir) throws IOException
     {
@@ -112,7 +117,7 @@ public class DirectoryWatcher extends Watcher {
     }
  
     /**
-     * Register the given directory, and all its sub-directories, with the WatchService.
+     * Déclaration de la façon de watcher les dossiers et leurs sous-dossiers grâce à registerDirectory
      */
     private void walkAndRegisterDirectories(final Path start) throws IOException {
         // register directory and sub-directories
@@ -123,14 +128,28 @@ public class DirectoryWatcher extends Watcher {
                 return FileVisitResult.CONTINUE;
             }
         });
-    } 
+    }
+    
+    /**
+     * Sauvegarde le changement détécté dans la BDD
+     */
+    private void saveChange(String type, String fullPath, String size, String time) {
+    	changeTypes.add(type);
+    	changePaths.add(fullPath);
+    	changeSizes.add(size);
+    	changeTimes.add(time);
+    }
+    
+    private boolean bigChangeDetected() {
+    	return false;
+    }
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		
 		while(true) {
 			 
-            // wait for key to be signalled
+            // wait for key to be signaled
             WatchKey key;
             try {
                 key = this.watcher.take();
@@ -169,7 +188,7 @@ public class DirectoryWatcher extends Watcher {
                 String[] etape_path = path_fichier.split("/");
                 boolean is_hidden = false;
                 
-                // On regarde si le fichier est caché (le nom commence par un point)
+                // On regarde si le fichier est caché (= le nom commence par un point)
                 for(int i=0; i<etape_path.length; i++){
                 	if(etape_path[i].length() > 0){
 	                	if(etape_path[i].charAt(0) == '.'){
@@ -180,7 +199,9 @@ public class DirectoryWatcher extends Watcher {
                 }
                 
                 if(!is_hidden){
+                	// On peut le traiter
                 	System.out.format("%s: %s size: %d bytes at %s\n", event.kind().name(), child, file.length(), date_event.toString());
+                	this.saveChange(event.kind().name(), child, file.length(), date_event.toString());
                 }     
                 /*======================================================================================================*/
                 
@@ -191,7 +212,7 @@ public class DirectoryWatcher extends Watcher {
                             walkAndRegisterDirectories(child);
                         }
                     } catch (IOException x) {
-                        // do something useful
+                        System.out.printf("ERROR : Le dossier "+ child.getFileName() +" n'as pas pû être ajouté à la liste des dossiers watchés");
                     }
                 }
             }
