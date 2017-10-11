@@ -39,8 +39,8 @@ public class DirectoryWatcher extends Watcher {
 	private Vector<Path> directoryList;
 	
 	private Vector<String> changeTypes;
-	private Vector<String> changePaths;
-	private Vector<String> changeSizes;
+	private Vector<Path> changePaths;
+	private Vector<Long> changeSizes;
 	private Vector<String> changeTimes;
 	 
 	/**
@@ -133,7 +133,7 @@ public class DirectoryWatcher extends Watcher {
     /**
      * Sauvegarde le changement détécté dans la BDD
      */
-    private void saveChange(String type, String fullPath, String size, String time) {
+    private void saveChange(String type, Path fullPath, Long size, String time) {
     	changeTypes.add(type);
     	changePaths.add(fullPath);
     	changeSizes.add(size);
