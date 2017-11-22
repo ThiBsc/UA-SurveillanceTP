@@ -2,7 +2,10 @@ package UASurveillanceEngine;
 
 import java.lang.String;
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
+
+import sun.applet.Main;
 
 
 /**
@@ -44,7 +47,7 @@ public class USBWatcher extends Watcher {
 				
 				// on attend un peu avant de refaire une boucle
 				try{
-					Thread.sleep(300);
+					Thread.sleep(400);
 				}
 				catch(InterruptedException e){
 					e.printStackTrace();
@@ -100,6 +103,10 @@ public class USBWatcher extends Watcher {
 			}
 		}
 
+	}
+	
+	public static void main(String args[]) throws IOException{
+		new USBWatcher().run();
 	}
 
 }
