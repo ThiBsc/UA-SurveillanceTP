@@ -1,1 +1,1 @@
-Ici les classes pour l'implémentation graphique
+Ici les classes pour l'implémentation graphique des enseignants
