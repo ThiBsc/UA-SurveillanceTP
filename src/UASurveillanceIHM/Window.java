@@ -12,16 +12,15 @@ public class Window extends JFrame {
 	private MenuBar menubar;
 	private SplitPane splitPane;
 	private StatusBar status;
-	/** plateau: Objet plateau qui sert à l'affichage du jeu -> hérité de JPanel */
 	private BorderLayout layout;
 	
-	private Window()
+	private Window()	
     {
 		layout = new BorderLayout();
 		menubar = new MenuBar();
 		splitPane = new SplitPane();
 		status = new StatusBar();
-		status.setStatus(StatusType.INFO, "Hello world!");
+		status.setStatus(StatusType.INFO, "Surveillance TP");
         initUI();
     }
 	private void initUI(){
