@@ -3,6 +3,7 @@ package UASurveillanceIHM;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
 
 import javax.swing.*;
 
@@ -24,12 +25,6 @@ public class MenuBarMethod implements ActionListener {
 			JOptionPane.showMessageDialog(null, credits, "About", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (e.getActionCommand().equals("ajout")){
-//			String form = "<html>Ajout d'un Examen" +
-//					"<br><table><tr><td>Date</td><td><input type=\"text\" name=\"dateEx\" value=\"\"></td></tr>" +
-//            		"<tr><td>Classe</td><td><input type=\"text\" name=\"classeEx\" value=\"\"></td></tr>" +
-//					"<tr><td>Matière</td><td><input type=\"text\" name=\"matiereEx\" value=\"\"></td></tr>" +
-//            		"<tr><td>Durée</td><td><input type=\"text\" name=\"dureeExs\" value=\"\"></td></tr>" +
-//            		"</table></html>";
 			
 	        JPanel panel = new JPanel(new GridLayout(0, 1));
 	        JLabel daEx = new JLabel("Date Examen");
@@ -43,7 +38,7 @@ public class MenuBarMethod implements ActionListener {
 			dateExam.setColumns(10);
 			classeExam.setColumns(20);
 			matiereExam.setColumns(20);
-			dureeExam.setColumns(20);
+			dureeExam.setColumns(10);
 	 
 			panel.add(daEx);
 			panel.add(dateExam);
@@ -59,10 +54,25 @@ public class MenuBarMethod implements ActionListener {
 			{
 			   //get infos from the form above to send them to the DB
 				String dateExamen = dateExam.getText();
-				String classeExamen = classeExam.getText();
-				String matiereExamen = matiereExam.getText();
+				int classeExamen = Integer.parseInt(classeExam.getText());
+				int matiereExamen = Integer.parseInt(matiereExam.getText());
 				String dureeExamen = dureeExam.getText();
-				//Connect to DB
+//				//Connect to DB
+//				Connection connection;
+//				try {
+//					connection = DriverManager.getConnection(
+//						    "jdbc:mysql://localhost:3306/test", "username", "password"
+//						);
+//					Statement stmt = connection.createStatement();
+//					stmt.executeUpdate(""); //INSERT INTO Examen VALUES (dateExamen+","+classeExamen+","+matiereExamen+","+dureeExamen);
+//					stmt.close();
+//					connection.close();
+//				} catch (SQLException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+					
+				
 			}
 
 			
