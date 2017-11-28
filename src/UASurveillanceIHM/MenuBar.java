@@ -1,4 +1,3 @@
- */
 package UASurveillanceIHM;
 
 import javax.swing.JMenu;
