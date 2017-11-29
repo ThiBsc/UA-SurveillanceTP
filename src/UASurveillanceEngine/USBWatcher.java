@@ -31,7 +31,8 @@ public class USBWatcher extends Watcher {
 			
 			// On regarde ensuite si le nombre de fichier/dossier dans /dev change
 			// si c'est le cas c'est qu'il y a eu un changement au niveau des périphériques connectés
-			while(true){
+			isRecording = true;
+			while(isRecording){
 				devices = dev.list();
 				Date current_date = new Date();			// pour voir la date quand il y a un changement
 				if(devices.length != connected_devices){
@@ -96,8 +97,8 @@ public class USBWatcher extends Watcher {
 			/*
 			 * On fait une boucle infinie pour vérifier si un nouveau périphérique a été connecté sur la machine.
 			 */
-			
-			while(true){
+			isRecording = true;
+			while(isRecording){
 				// On regarde les périphériques un par un.
 				for(int i=0; i<letters.length; i++){
 					boolean pluggedIn = drives[i].canRead();
@@ -120,11 +121,6 @@ public class USBWatcher extends Watcher {
 				catch(InterruptedException e){}
 			}
 		}
-
-	}
-	
-	public static void main(String args[]) throws IOException{
-		new USBWatcher().run();
 	}
 
 }

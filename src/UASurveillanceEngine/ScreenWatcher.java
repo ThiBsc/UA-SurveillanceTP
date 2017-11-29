@@ -51,16 +51,10 @@ public class ScreenWatcher extends Watcher {
 				e1.printStackTrace();
 				canRun = false;
 			}
-			ProcessBuilder pb_ffmepg = new ProcessBuilder("ffmpeg -f x11grab -s 1920x1080 -i :0.0 -vf scale=896:504 -f avi pipe:1 > /tmp/videopipe");
-			Process p_ffmpeg = null;
-			try {
-				p_ffmpeg = pb_ffmepg.start();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				canRun = false;
-			}
 			if (canRun){
+				System.out.println("Opening videopipe...");
 				FileInputStream fis = new FileInputStream(new File("/tmp/videopipe"));
+				System.out.println("videopipe opened!");
 				FileOutputStream fos = new FileOutputStream(new File("/tmp/test.avi"));
 				isRecording = true;
 				while  (isRecording){
@@ -92,8 +86,6 @@ public class ScreenWatcher extends Watcher {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					if (p_ffmpeg != null)
-						p_ffmpeg.destroy();
 				}
 				try {
 					fis.close();

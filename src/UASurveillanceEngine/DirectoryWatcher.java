@@ -221,8 +221,8 @@ public class DirectoryWatcher extends Watcher {
      */
 	@Override
 	public void run() {
-		
-		while(true) {
+		isRecording = true;
+		while(isRecording) {
 			 
             // wait for key to be signaled
             WatchKey key;
