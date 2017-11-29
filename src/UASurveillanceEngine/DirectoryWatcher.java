@@ -69,7 +69,7 @@ public class DirectoryWatcher extends Watcher {
 	 * @throws IOException 
 	 */
 	public DirectoryWatcher( Vector<Path> directories ) throws IOException {
-		
+		super("DIRECTORY");
 		this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<WatchKey, Path>();
         this.directoryList = directories;

@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import sun.applet.Main;
-
 
 /**
  * 
@@ -16,7 +14,8 @@ public class USBWatcher extends Watcher {
 	/**
 	 * Default constructor
 	 */
-	public USBWatcher() {		
+	public USBWatcher() {
+		super("USB");
 	}
 		
 	@Override

@@ -9,129 +9,97 @@ import javax.imageio.ImageWriter;
 
 import java.awt.AWTException;
 import java.awt.Toolkit;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.concurrent.TimeUnit;
-
-import com.xuggle.mediatool.IMediaWriter;
-import com.xuggle.mediatool.ToolFactory;
-import com.xuggle.xuggler.ICodec;
-import com.xuggle.xuggler.IMediaData;
 
 /**
  * 
  */
 public class ScreenWatcher extends Watcher {
 
-	private static final String OUTFILE = "/home/etudiant/vid/test.mp4"; //Connexion en FTP à mettre en place
-	private static final int width=640, height=480; // 16*9 -> 768*432	
+	/**
+	 * ffmpeg -f x11grab -s 1920x1080 -i :0.0 -f avi pipe:1 > /tmp/videopipe
+	 * ffmpeg -f x11grab -s 1920x1080 -i :0.0 -vf scale=896:504 -f avi pipe:1 > /tmp/videopipe
+	 */
+	
+	private static final int width=640, height=480; // 16*9 -> 768*432
 
 	
 	/**
 	 * Default constructor
 	 */
 	public ScreenWatcher() {
-		isRecording = false;
-	}
-
-	/**
-	 * 
-	 */
-	private Robot robot;
-
-	/**
-	 * 
-	 */
-	private Rectangle area;
-
-	/**
-	 * 
-	 */
-	private IMediaWriter writer;
-
-
-	/**
-	 * @return
-	 */
-	private BufferedImage getScreenCapture() {
-		 BufferedImage img = robot.createScreenCapture(area);
-	     return img;
-	}
-
-	/**
-	 * Convertit l'image source dans le bon format
-	 * @param sourceImage - l'image retournée par getScreenCapture()
-	 * @param targetType - Le format cible
-
-	 * @return L'image convertie
-	 */
-	private BufferedImage convertToType(BufferedImage sourceImage, int targetType) {
-
-        BufferedImage image;
-
-        // Si l'image a déjà le bon type, ne rien faire
-
-        if (sourceImage.getType() == targetType)
-            image = sourceImage;
-
-        // Sinon on refait l'image
-        else {
-            image = new BufferedImage(sourceImage.getWidth(), sourceImage.getHeight(), targetType);
-            image.getGraphics().drawImage(sourceImage, 0, 0, null);
-        }
-
-        return image;
-    }
-
-
-
-	/**
-	 * 
-	 */
-	public void sendStream() {
-		// TODO implement here
+		super("SCREEN");
 	}
 
 	@Override
 	public void run() {
+		boolean canRun = true;
+		System.out.println("Waiting for data...");
 		try {
-
-			robot = new Robot();
-			writer = ToolFactory.makeWriter(OUTFILE);
-	        area = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-	        
-	        writer.addVideoStream(area.x, area.y, ICodec.ID.CODEC_ID_MPEG4, width, height);
-
-	        long startTime = System.nanoTime();
-
-	        isRecording = true;
-
-	        while (isRecording){
-
-	            BufferedImage bgrScreen = getScreenCapture();
-	            System.out.println("time stamp = "+ (System.nanoTime() - startTime));
-	            bgrScreen = convertToType(bgrScreen, BufferedImage.TYPE_3BYTE_BGR);
-
-	            writer.encodeVideo(0, bgrScreen, System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
-
-	            // Une image toutes les demi-secondes
-	            try {
-	                Thread.sleep((long) (500));
-	            } catch (InterruptedException e) {
-	            	}
-	        }
-
-	        writer.close();
-
-		} catch (AWTException e1) {
-
-			e1.printStackTrace();
-
+			ProcessBuilder pb = new ProcessBuilder("mkfifo", "/tmp/videopipe");
+			try {
+				Process p = pb.start();
+				p.waitFor();
+			} catch (IOException | InterruptedException e1) {
+				e1.printStackTrace();
+				canRun = false;
+			}
+			if (canRun){
+				FileInputStream fis = new FileInputStream(new File("/tmp/videopipe"));
+				FileOutputStream fos = new FileOutputStream(new File("/tmp/test.avi"));
+				isRecording = true;
+				while  (isRecording){
+					try {
+						if (fis.available() != 0){
+							int size_available = fis.available();
+							byte[] data = new byte[size_available];
+							fis.read(data, 0, size_available);
+							fos.write(data);
+							//System.out.println(new String(data));
+							// envoie au server
+							//Socket socketEvent = new Socket("172.29.116.105", 3615);
+							Socket socketEvent = new Socket("127.0.0.1", 3615);
+							DataOutputStream writer = new DataOutputStream(socketEvent.getOutputStream());
+							
+							// write video part info
+							String video_info = "SCREEN|thibaut";
+							// Write data
+							byte[] info = video_info.getBytes("UTF-8");
+							writer.writeInt(info.length);
+							writer.write(info);
+							// write video part data
+							writer.writeInt(size_available);
+							writer.write(data);
+							writer.flush();
+							writer.close();
+							socketEvent.close();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				try {
+					fis.close();
+					fos.flush();
+					fos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} finally {
-
-			robot = null;
-			writer = null;
-			isRecording = false;
-		}        
-
+			System.out.println("Stop reading from named pipe. Good bye !");
+			File f = new File("/tmp/videopipe");
+			f.delete();
+		}
 	}
 
 }
