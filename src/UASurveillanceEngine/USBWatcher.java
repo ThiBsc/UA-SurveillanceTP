@@ -1,6 +1,7 @@
 package UASurveillanceEngine;
 
 import java.lang.String;
+import java.net.UnknownHostException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -35,11 +36,29 @@ public class USBWatcher extends Watcher {
 				Date current_date = new Date();			// pour voir la date quand il y a un changement
 				if(devices.length != connected_devices){
 					if(devices.length < connected_devices){
-						System.out.println("Un périphérique a été déconnecté : "+current_date.toString()+".");
+//						System.out.println("Un périphérique a été déconnecté : "+current_date.toString()+".");
+						try {
+							sendEvent("DISCONNECTED");
+						} catch (UnknownHostException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						connected_devices = devices.length;
 					}
 					else{
-						System.out.println("Un périphérique a été connecté : "+current_date.toString()+".");
+//						System.out.println("Un périphérique a été connecté : "+current_date.toString()+".");
+						try {
+							sendEvent("CONNECTED");
+						} catch (UnknownHostException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						connected_devices = devices.length;
 					}
 				}
