@@ -299,8 +299,25 @@ public class DirectoryWatcher extends Watcher {
 						
                 	}
                 	
-                	// Dans tous les cas, on sauvegarde le changement
-            		saveChange(type, fullPath, size, time);
+                	// Dans tous les cas, on envoit le changement
+                	// Caractère à échaper -> | si jamais le fichier le contient
+                	String escape_char = "|";
+                	String delimiter = ";";
+                	String info_changes_text =
+                			type + delimiter
+                			+ fullPath + delimiter
+                			+ size + delimiter
+                			+ time
+                			;
+            		try {
+						sendEvent(info_changes_text);
+					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                 	
                 }     
                 /*======================================================================================================*/
