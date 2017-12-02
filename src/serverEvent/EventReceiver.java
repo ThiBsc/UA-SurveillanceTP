@@ -11,6 +11,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import UASurveillanceIHM.DatabaseSingleton;
 
 public class EventReceiver extends Thread {
 
@@ -26,43 +30,82 @@ public class EventReceiver extends Thread {
 	
 	@Override
 	public void run() {
-		System.out.println("EventAgregator is waiting for suspicious event...");
-		running = true;
+		DatabaseSingleton bdd = DatabaseSingleton.getInstance();
+		System.out.println("EventReceiver is waiting for suspicious event...");
 		try {
-			ss = new ServerSocket(3615);
+			String video_path = "";
+			try {
+				bdd.connect("127.0.0.1", "UA-user", "ua_surveillance", "ua-user");
+				ResultSet rset = bdd.query("select path from VIDEO_PATH where nom like \"Test\";");
+				rset.next();
+				video_path = rset.getString("path");
+				rset.close();
+				ss = new ServerSocket(3615);
+				running = true;
+			} catch (SQLException | ClassNotFoundException e) {
+				System.err.println(e.getMessage());
+				running = false;
+			}
 			while (running){
 				Socket clientSocket = ss.accept();
 				DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
-				while (dis.available() != 0) {
-					// "TYPE|etu_name|etu_prenom|data|(?other)"
-					// get line info
-					int line_length = dis.readInt();
-					byte[] line_byte = new byte[line_length];
-					dis.read(line_byte);
-					String line = new String(line_byte, "UTF-8");
-					// treatment
-					if (line.startsWith("USB")){
-						System.out.println(line);
-					} else if (line.startsWith("SCREEN")){
-						// "SCREEN|etudiantname"
-						int available = dis.readInt();
-						String etudiant = line.split("\\|")[1];
-						byte[] data = new byte[available];
-						FileOutputStream fos = new FileOutputStream(new File("/tmp/test_server_"+etudiant+".avi"), true);
-						dis.read(data);
-						fos.write(data);
-						fos.close();
-					} else if (line.startsWith("DIRECTORY")){
-						System.out.println(line);
-					} else if (line.startsWith("NETWORK")){
-						System.out.println(line);
-					} else {
-						System.err.println("Protocol not recognized.");
-					}						
+				/**
+				 * Waiting for socket data, with 100 attemps max
+				 */
+				int attempts = 0;
+				while (dis.available() == 0 && attempts++ < 100){
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				// "TYPE|exam_id|etu_name|etu_prenom|date|(?other)"
+				// get line info
+				int line_length = dis.readInt();
+				byte[] line_byte = new byte[line_length];
+				dis.read(line_byte);
+				
+				String line = new String(line_byte, "UTF-8");
+				String type = line.split("\\|")[0];
+				int exam_id = Integer.parseInt(line.split("\\|")[1]);
+				String nom = line.split("\\|")[2];
+				String prenom = line.split("\\|")[3];
+				
+				// treatment
+				if (type.equals("USB") || type.equals("DIRECTORY") || type.equals("NETWORK")){
+					String other = line.split("\\|")[5];
+					
+					// values (id_exam, type, nom, prenom, date, other)
+					String insert_format = "insert into EXAMEN_has_EVENEMENT " +
+							"(EXAMEN_id, EVENEMENT_type, etu_nom, etu_prenom, date, other) " +
+							"values (%d, \"%s\", \"%s\", \"%s\", current_timestamp, \"%s\");";
+					System.out.println(line);
+					try {
+						bdd.insert(String.format(insert_format, exam_id, type, nom, prenom, other));
+					} catch (Exception e) {
+						System.err.println(e.getMessage());
+					}
+				} else if (type.equals("SCREEN")){
+					// "SCREEN|etudiantname"
+					int available = dis.readInt();
+					byte[] data = new byte[available];
+					FileOutputStream fos = new FileOutputStream(new File(video_path+exam_id+"_"+nom+"_"+prenom+".avi"), true);
+					dis.read(data);
+					fos.write(data);
+					fos.close();
+				} else {
+					System.err.println("Protocol not recognized.");
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
+		} finally {
+			try {
+				bdd.disconnect();
+			} catch (SQLException e) {
+				System.err.println(e.getMessage());
+			}
 		}
 	}
 

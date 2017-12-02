@@ -306,9 +306,7 @@ public class DirectoryWatcher extends Watcher {
                 	String info_changes_text =
                 			type + delimiter
                 			+ fullPath + delimiter
-                			+ size + delimiter
-                			+ time
-                			;
+                			+ size;
             		try {
 						sendEvent(info_changes_text);
 					} catch (UnknownHostException e) {

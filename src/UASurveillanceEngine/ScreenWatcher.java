@@ -55,7 +55,7 @@ public class ScreenWatcher extends Watcher {
 				System.out.println("Opening videopipe...");
 				FileInputStream fis = new FileInputStream(new File("/tmp/videopipe"));
 				System.out.println("videopipe opened!");
-				FileOutputStream fos = new FileOutputStream(new File("/tmp/test.avi"));
+				//FileOutputStream fos = new FileOutputStream(new File("/tmp/test.avi"));
 				isRecording = true;
 				while  (isRecording){
 					try {
@@ -63,25 +63,11 @@ public class ScreenWatcher extends Watcher {
 							int size_available = fis.available();
 							byte[] data = new byte[size_available];
 							fis.read(data, 0, size_available);
-							fos.write(data);
+							//fos.write(data);
 							//System.out.println(new String(data));
 							// envoie au server
 							//Socket socketEvent = new Socket("172.29.116.105", 3615);
-							Socket socketEvent = new Socket("127.0.0.1", 3615);
-							DataOutputStream writer = new DataOutputStream(socketEvent.getOutputStream());
-							
-							// write video part info
-							String video_info = "SCREEN|thibaut";
-							// Write data
-							byte[] info = video_info.getBytes("UTF-8");
-							writer.writeInt(info.length);
-							writer.write(info);
-							// write video part data
-							writer.writeInt(size_available);
-							writer.write(data);
-							writer.flush();
-							writer.close();
-							socketEvent.close();
+							sendEventData(size_available, data);
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -89,8 +75,8 @@ public class ScreenWatcher extends Watcher {
 				}
 				try {
 					fis.close();
-					fos.flush();
-					fos.close();
+					//fos.flush();
+					//fos.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
