@@ -73,7 +73,7 @@ public abstract class Watcher extends Thread {
 	public void sendEventData(int size, byte[] data) throws UnknownHostException, IOException{
 		if (canSendEvent()){
 			Date current_date = new Date();
-			socketEvent = new Socket("127.0.0.1", 3615);
+			socketEvent = new Socket(IP_SERVER, 3615);
 			DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
 			//writer = new PrintWriter(socketEvent.getOutputStream());
 			String event_info = type+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString();

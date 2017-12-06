@@ -88,9 +88,20 @@ public class EventReceiver extends Thread {
 					}
 				} else if (type.equals("SCREEN")){
 					// "SCREEN|etudiantname"
+					String VIDEO_PATH_nom = video_path+exam_id+"_"+nom+"_"+prenom+".avi";
+					String insert_format = "insert into EXAMEN_has_VIDEO_PATH " +
+							"(EXAMEN_id, VIDEO_PATH_nom, etu_nom, etu_prenom, create_date, etu_hostname, etu_ip) " +
+							"select * from (select %d, \"%s\", \"%s\", \"%s\", current_timestamp, \"\" as host, \"\" as ip) as tab " +
+							"where not exists (" +
+							"select EXAMEN_id from EXAMEN_has_VIDEO_PATH where EXAMEN_id=%d and VIDEO_PATH_nom like \"%s\");";
+					try {
+						bdd.insert(String.format(insert_format, exam_id, "Test", nom, prenom, exam_id, "Test"));
+					} catch (SQLException e) {
+						System.err.println(e.getMessage());
+					}
 					int available = dis.readInt();
 					byte[] data = new byte[available];
-					FileOutputStream fos = new FileOutputStream(new File(video_path+exam_id+"_"+nom+"_"+prenom+".avi"), true);
+					FileOutputStream fos = new FileOutputStream(new File(VIDEO_PATH_nom), true);
 					dis.read(data);
 					fos.write(data);
 					fos.close();
