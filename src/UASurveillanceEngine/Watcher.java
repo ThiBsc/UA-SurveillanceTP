@@ -22,6 +22,7 @@ public abstract class Watcher extends Thread {
 	public static int EXAMEN_id = -1;
 	public static String ETU_NOM = null;
 	public static String ETU_PRENOM = null;
+	public static String IP_SERVER = "127.0.0.1";
 
 	private String type;
 	protected volatile boolean isRecording; //synchronized non autorisé
@@ -55,7 +56,7 @@ public abstract class Watcher extends Thread {
 		if (canSendEvent()){
 			UASurveillanceIHMEtud.Window.getInstance().displayEventIsSending();
 			Date current_date = new Date();
-			socketEvent = new Socket("127.0.0.1", 3615);
+			socketEvent = new Socket(IP_SERVER, 3615);
 			DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
 			//writer = new PrintWriter(socketEvent.getOutputStream());
 			String event_info = type+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString()+"|"+msg;
@@ -71,7 +72,6 @@ public abstract class Watcher extends Thread {
 	
 	public void sendEventData(int size, byte[] data) throws UnknownHostException, IOException{
 		if (canSendEvent()){
-			UASurveillanceIHMEtud.Window.getInstance().displayEventIsSending();
 			Date current_date = new Date();
 			socketEvent = new Socket("127.0.0.1", 3615);
 			DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
@@ -122,12 +122,12 @@ public abstract class Watcher extends Thread {
 		 */
 		// directoriesToWatch pourra être une variable static final
 		Vector <Path> directoriesToWatch = new Vector<Path>();	
-		String usernameEtudiant = "etudiant";
+//		String home_path = System.getProperty("user.home");
+		String home_path = "/home/etudiant";
 		// Variables à tester
 		
 		// Pour tester j'ai mis le dossier du projet et celui de téléchargement
-		directoriesToWatch.add( Paths.get("/home/"+ usernameEtudiant +"/Documents/") );
-		directoriesToWatch.add( Paths.get("/home/"+ usernameEtudiant +"/Téléchargements/") );
+		directoriesToWatch.add( Paths.get(home_path) );
 		DirectoryWatcher dw = null;
 		try {
 			dw = new DirectoryWatcher(directoriesToWatch);
