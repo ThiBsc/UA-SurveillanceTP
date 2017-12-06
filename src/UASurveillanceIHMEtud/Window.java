@@ -2,6 +2,7 @@ package UASurveillanceIHMEtud;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,20 +17,20 @@ public class Window extends JFrame {
 	private static final long serialVersionUID = -5086125816507692170L;
 
 	static Window instance;
+	// Envoie = vert
 	private final Color color_sending = new Color(0, 255, 0);
+	// Attente = jaune
 	private final Color color_waiting = new Color(255, 255, 0);
 	
 	// Window components Size
-	private final int width = 600;
+	private final int width = 500;
 	private final int height = 200;
 	private final int horizontal_margin = 10;
 	private final int vertical_margin = 10;
-	private final int size_temoin_envoie = 100;
+	private final int size_temoin_envoie = 130;
 	
 	private String etud_nom;
 	private String etud_prenom;
-	// Le numéro étudiant, ça fait encore plus peur aux étudiants
-	private String etud_numero;
 	private String exam_id;
 
 	private JLabel label_examen;
@@ -50,7 +51,7 @@ public class Window extends JFrame {
 		label_etudiant = new JLabel();
 		menuBar = new MenuBar();
 		
-		// On demande l'id de l'examen à l'ouverture
+		// On initialise les paramètres
 		FrameInitialisation.getInstance();
 		
         initUI();
@@ -59,24 +60,27 @@ public class Window extends JFrame {
 	private void initUI() {
 		setLayout(layout);
 		setTitle("UA-SurveillanceTP");
+		
 	    // Taille de la frame
 	    setSize(width, height);
+	    
 	    // Placer au centre de l'ecran
 	    setLocationRelativeTo(null);
+	    
 	    // Resizable ou non
 	    setResizable(false);
+        
+        // Action a la fermeture (croix)
+        // TODO
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	    label_examen.setHorizontalAlignment(JLabel.CENTER);
 	    
 	    initMainPanel();
 	    
         add(main_panel, BorderLayout.CENTER);
-//        add(menuBar, BorderLayout.NORTH);
+        add(menuBar, BorderLayout.NORTH);
         add(label_examen, BorderLayout.SOUTH);
-        
-        // Action a la fermeture (croix)
-        // TODO
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	private void initMainPanel() {
@@ -87,11 +91,11 @@ public class Window extends JFrame {
 			// Decalage à gauche: la margin + le décalage qui permet de centrer le temoin
 	    	( this.getWidth()/3 - size_temoin_envoie ) /2,
 			// Décalage en haut: la margin + le décalage qui permet de centrer le temoin
-	    	(this.getHeight() - size_temoin_envoie ) /2,
+	    	vertical_margin,
 	    	// Occupe la taille du témoin - les margins à gauche et à droite
 	    	size_temoin_envoie - 2*horizontal_margin,
-	    	// Occupe toute la hauteur - les margins en haut et en bas
-	    	size_temoin_envoie - 2*vertical_margin
+	    	// Occupe la taille du témoin
+	    	size_temoin_envoie
 	    );
 		
 		// On met le temoin en couleur d'attente
@@ -106,12 +110,13 @@ public class Window extends JFrame {
 			// Decalage à gauche : se décale du tiers de la largeur
 	    	this.getWidth()/3 + horizontal_margin,
 			// Décalage en haut
-	    	vertical_margin,
+	    	0,
 	    	// Occupe les deux tiers de la largeur - les margins à gauche et à droite
 	    	this.getWidth()*2/3 - 2*horizontal_margin,
 	    	// Occupe toute la hauteur - les margins en haut et en bas
-	    	this.getHeight() - 2*vertical_margin
+	    	this.getHeight()
 	    );
+	    label_etudiant.setFont(new Font("TimesRoman", Font.CENTER_BASELINE, 15));
 	    
 	    // On ajoute les composants au panel
 	    main_panel.add(temoin_envoie);
@@ -119,14 +124,14 @@ public class Window extends JFrame {
 	}
 
 	public void refreshUI() {
-        label_etudiant.setText( etud_nom.toUpperCase() + " " + etud_prenom + " " + etud_numero );
+        label_etudiant.setText(  etud_prenom + " " + etud_nom.toUpperCase() );
 		label_examen.setText( "Vous participez à l'examen n°" + exam_id );	
 	}
 	
 	public void displayEventIsSending() {
 		// On met le fond du témoin en vert pour une demi seconde
 		temoin_envoie.setBackground(color_sending);
-		System.out.println("Attention, on envoie dans la base ce que tu fais frr");
+		
 		// Après 500ms on remet le fond d'attente
 		new java.util.Timer().schedule( 
 		        new java.util.TimerTask() {
@@ -141,6 +146,7 @@ public class Window extends JFrame {
 	
 	/**
 	 * GETTERS & SETTERS
+	 * Pour chaque setters, on met à jour les variables des watchers
 	 */
 	
 	public String getEtud_nom() {
@@ -161,14 +167,6 @@ public class Window extends JFrame {
 		Watcher.ETU_PRENOM = etud_prenom;
 	}
 
-	public String getEtud_numero() {
-		return etud_numero;
-	}
-
-	public void setEtud_numero(String etud_numero) {
-		this.etud_numero = etud_numero;
-	}
-
 	public String getExam_id() {
 		return exam_id;
 	}
@@ -179,16 +177,16 @@ public class Window extends JFrame {
 		
 	}
 	
-    public static void main(String[] args)
-    {
-        Window window = Window.getInstance();
-    }
-	
 	public static Window getInstance() {
 		if (instance == null) {
 			instance = new Window();
 		}
 		return instance;		
 	}
+	
+    public static void main(String[] args)
+    {
+        Window window = Window.getInstance();
+    }
 
 }

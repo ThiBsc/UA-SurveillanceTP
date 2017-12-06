@@ -164,20 +164,6 @@ public class DirectoryWatcher extends Watcher {
     }
     
     /**
-     * Sauvegarde le changement détécté dans la BDD
-     * @param type
-     * @param fullPath
-     * @param size
-     * @param time
-     */
-    private void saveChange(String type, Path fullPath, Long size, String time) {
-    	this.changeTypes.add(type);
-    	this.changePaths.add(fullPath);
-    	this.changeSizes.add(size);
-    	this.changeTimes.add(time);
-    }
-    
-    /**
      * Valeur en bytes du changement de taille entre l'enregistrement actuel d'un fichier et le dernier
      * @param type
      * @param fullPath

@@ -13,7 +13,7 @@ public abstract class PopUp extends JFrame {
 	private final int base_height = 0;
 	private final int horizontal_margin = 10;
 	private final int vertical_margin = 10;
-	private final int component_height = 20;
+	private final int component_height = 25;
 
 	public PopUp(int nbComponents) {
 		this.getContentPane().setLayout(null);
