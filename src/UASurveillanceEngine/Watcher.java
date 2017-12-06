@@ -15,6 +15,10 @@ import UASurveillanceIHM.DatabaseSingleton;
  */
 public abstract class Watcher extends Thread {
 
+	public static int EXAMEN_id = -1;
+	public static String ETU_NOM = null;
+	public static String ETU_PRENOM = null;
+
 	private String type;
 	protected volatile boolean isRecording; //synchronized non autorisé
 	protected Socket socketEvent;
@@ -33,6 +37,9 @@ public abstract class Watcher extends Thread {
 	 */
 	protected DatabaseSingleton db;
 
+	private boolean canSendEvent(){
+		return EXAMEN_id != -1 && ETU_NOM != null && ETU_PRENOM != null;
+	}
 
 	/**
 	 * @param msg 
@@ -40,20 +47,39 @@ public abstract class Watcher extends Thread {
 	 * @throws IOException 
 	 * @throws UnknownHostException 
 	 */
-	public boolean sendEvent(String msg) throws UnknownHostException, IOException {
-		Date current_date = new Date();
-		socketEvent = new Socket("127.0.0.1", 3615);
-		DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
-		//writer = new PrintWriter(socketEvent.getOutputStream());
-		String nom, prenom;
-		nom = prenom = "";
-		String event_info = type+"|"+nom+"|"+prenom+"|"+current_date.toString()+"|"+msg;
-		byte[] event = event_info.getBytes("UTF-8");
-		dos.writeInt(event.length);
-		dos.write(event);
-		dos.close();
-		socketEvent.close();
-		return false;
+	public void sendEvent(String msg) throws UnknownHostException, IOException {
+		if (canSendEvent()){
+			Date current_date = new Date();
+			socketEvent = new Socket("127.0.0.1", 3615);
+			DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
+			//writer = new PrintWriter(socketEvent.getOutputStream());
+			String event_info = type+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString()+"|"+msg;
+			byte[] event = event_info.getBytes("UTF-8");
+			dos.writeInt(event.length);
+			dos.write(event);
+			dos.flush();
+			System.err.println("Sending event: "+event_info);
+			dos.close();
+			socketEvent.close();
+		}
+	}
+	
+	public void sendEventData(int size, byte[] data) throws UnknownHostException, IOException{
+		if (canSendEvent()){
+			Date current_date = new Date();
+			socketEvent = new Socket("127.0.0.1", 3615);
+			DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
+			//writer = new PrintWriter(socketEvent.getOutputStream());
+			String event_info = type+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString();
+			byte[] event = event_info.getBytes("UTF-8");
+			dos.writeInt(event.length);
+			dos.write(event);
+			dos.writeInt(size);
+			dos.write(data);
+			dos.flush();
+			dos.close();
+			socketEvent.close();
+		}
 	}
 	
 	/**
