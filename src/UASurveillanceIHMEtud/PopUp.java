@@ -2,6 +2,7 @@ package UASurveillanceIHMEtud;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 public abstract class PopUp extends JFrame {
 	
@@ -17,13 +18,19 @@ public abstract class PopUp extends JFrame {
 	public PopUp(int nbComponents) {
 		this.getContentPane().setLayout(null);
 		this.setTitle("Examen");
+		
 	    // Taille de la frame
 		int height = base_height+ component_height*(nbComponents+2) + vertical_margin*(nbComponents+1);
 		this.setSize(width, height);
+		
 	    // Placer au centre de l'ecran
 		this.setLocationRelativeTo(null);
+		
 		// Non resizable
 		this.setResizable(false);
+		
+		// On interdit la fermeture de la fenêtre
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	}
 	
 	protected abstract void initFrame();

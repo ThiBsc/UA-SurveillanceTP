@@ -1,11 +1,15 @@
 package UASurveillanceEngine;
 
+import java.awt.Toolkit;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
+import java.util.Vector;
 
 import UASurveillanceIHM.DatabaseSingleton;
 
@@ -49,6 +53,7 @@ public abstract class Watcher extends Thread {
 	 */
 	public void sendEvent(String msg) throws UnknownHostException, IOException {
 		if (canSendEvent()){
+			UASurveillanceIHMEtud.Window.getInstance().displayEventIsSending();
 			Date current_date = new Date();
 			socketEvent = new Socket("127.0.0.1", 3615);
 			DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
@@ -66,6 +71,7 @@ public abstract class Watcher extends Thread {
 	
 	public void sendEventData(int size, byte[] data) throws UnknownHostException, IOException{
 		if (canSendEvent()){
+			UASurveillanceIHMEtud.Window.getInstance().displayEventIsSending();
 			Date current_date = new Date();
 			socketEvent = new Socket("127.0.0.1", 3615);
 			DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
@@ -107,6 +113,55 @@ public abstract class Watcher extends Thread {
 	 */
 	public void stopRecording() {
 		this.isRecording=false;
+	}
+	
+	static public void startWatchers() {
+
+		/**
+		 * DirectoryWatcher
+		 */
+		// directoriesToWatch pourra être une variable static final
+		Vector <Path> directoriesToWatch = new Vector<Path>();	
+		String usernameEtudiant = "etudiant";
+		// Variables à tester
+		
+		// Pour tester j'ai mis le dossier du projet et celui de téléchargement
+		directoriesToWatch.add( Paths.get("/home/"+ usernameEtudiant +"/Documents/") );
+		directoriesToWatch.add( Paths.get("/home/"+ usernameEtudiant +"/Téléchargements/") );
+		DirectoryWatcher dw = null;
+		try {
+			dw = new DirectoryWatcher(directoriesToWatch);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		/**
+		 * NetworkWatcher
+		 */
+		NetworkWatcherHistoryChrome nwhc = new NetworkWatcherHistoryChrome("/home/thibaut/.config/google-chrome/Default/History");
+		NetworkWatcherHistoryMozilla nwhm = new NetworkWatcherHistoryMozilla("~/.mozilla/firefox/ugm37j7z.default-1462882570889/places.sqlite");
+		NetworkWatcherTCP nwtcp = new NetworkWatcherTCP();
+		/**
+		 * USBWatcher
+		 */
+		USBWatcher usbw = new USBWatcher();
+		/**
+		 * ScreenWatcher
+		 */
+		ScreenWatcher sw = new ScreenWatcher();
+		int screen_w, screen_h;
+		screen_w = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+		screen_h = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+		FFMpegRunner ffmpeg = new FFMpegRunner(screen_w, screen_h);
+		/**
+		 * Lancement des Threads
+		 */
+		dw.start();
+		nwhc.start();
+		nwhm.start();
+		nwtcp.start();
+		sw.start();
+		ffmpeg.start();
+		usbw.start();
 	}
 
 }

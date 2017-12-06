@@ -59,13 +59,24 @@ public class FrameInitialisation extends PopUp {
 				  // Si les champs sont valides
 				  if ( formulaireValide() ) {
 					  Window window = Window.getInstance();
+					  
+					  // On met à jour les champs
 					  window.setEtud_prenom(field_etudiant_firstname.getText());
 					  window.setEtud_nom(field_etudiant_lastname.getText());
 					  window.setEtud_numero(field_etudiant_num.getText());
 					  window.setExam_id(field_exam_id.getText());
+					  
+					  // On rend l'UI visible
 					  window.refreshUI();
-					  getInstance().dispose();
+					  window.setVisible(true);
+					  
+					  // On start les watchers
+					  UASurveillanceEngine.Watcher.startWatchers();
+					  
+					  // On ferme la fenêtre
+					  FrameInitialisation.getInstance().dispose();
 				  } else {
+					  // Message d'erreur
 					  JOptionPane.showMessageDialog(null, "Le formulaire n'est pas valide", "Erreur", JOptionPane.ERROR_MESSAGE);
 				  }
 			  } 
