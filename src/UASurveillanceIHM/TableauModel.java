@@ -33,6 +33,10 @@ public class TableauModel<T> extends AbstractTableModel implements TableModel {
 		_dataList.add(o);
 	}
 	
+	public void addValue(ArrayList<T> o){
+		_dataList=o;
+	}
+	
 	public T getObjectTAt(int row){
 		return _dataList.get(row);
 	}
