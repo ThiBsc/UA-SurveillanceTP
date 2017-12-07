@@ -57,21 +57,7 @@ public class MenuBarMethod implements ActionListener {
 				int classeExamen = Integer.parseInt(classeExam.getText());
 				int matiereExamen = Integer.parseInt(matiereExam.getText());
 				String dureeExamen = dureeExam.getText();
-//				//Connect to DB
-//				Connection connection;
-//				try {
-//					connection = DriverManager.getConnection(
-//						    "jdbc:mysql://localhost:3306/test", "username", "password"
-//						);
-//					Statement stmt = connection.createStatement();
-//					stmt.executeUpdate(""); //INSERT INTO Examen VALUES (dateExamen+","+classeExamen+","+matiereExamen+","+dureeExamen);
-//					stmt.close();
-//					connection.close();
-//				} catch (SQLException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				}
-					
+			
 				
 			}
 
