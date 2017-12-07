@@ -35,10 +35,10 @@ public class TableauModelExamen extends TableauModel<Examen> {
             return _dataList.get(rowIndex).getDate();
         case 1:
 //            return getColumnName(columnIndex);
-            return _dataList.get(rowIndex).getProm_id();
+            return _dataList.get(rowIndex).getPromotion();
         case 2:
 //            return getColumnName(columnIndex);
-            return _dataList.get(rowIndex).getMat_id();
+            return _dataList.get(rowIndex).getMatiere();
         case 3:
 //            return getColumnName(columnIndex);
             return _dataList.get(rowIndex).getDuree();

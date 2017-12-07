@@ -9,15 +9,16 @@ import UASurveillanceEngine.*;
 public class Examen {
 	private ConnexionBase conn;
 	private ResultSet rs;
+	private int id;
 	private String date;
 	private String duree;
 	private int ens_id;
 	private int mat_id;
-	private int prom_id;
-	private int id;
-	private String promo;
 	private String matiere;
-
+	private int prom_id;
+	private String promotion;
+	private ArrayList<ComportementSuspect> m_comportements;
+	
 
 	/**
 	 * Constructeur visant à créer un nouvel examen
@@ -37,30 +38,38 @@ public class Examen {
 		this.prom_id = prom_id;
 	}
 	
-	public ConnexionBase getConn() {
-		return conn;
-	}
-	
-	public int getId(){
+	public int getId() {
 		return id;
 	}
-	
-	public void setId(int id){
-		this.id=id;
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setMatiere(String matiere) {
+		this.matiere = matiere;
+	}
+
+	public void setPromotion(String promotion) {
+		this.promotion = promotion;
+	}
+
+	public String getMatiere() {
+		return matiere;
+	}
+
+	public String getPromotion() {
+		return promotion;
+	}
+
+	public ConnexionBase getConn() {
+		return conn;
 	}
 
 	public ResultSet getRs() {
 		return rs;
 	}
 
-	public void setPromotion(String promo) {
-		this.promo = promo;
-	}
-
-	public void setMatiere(String matiere) {
-		this.matiere = matiere;
-	}
-	
 	public String getDate() {
 		return date;
 	}
@@ -81,5 +90,11 @@ public class Examen {
 		return prom_id;
 	}
 	
-	
+	public void addComportementSuspect(ComportementSuspect c){
+        m_comportements.add(c);
+    }
+    
+    public ArrayList<ComportementSuspect> getComportementsSuspects(){
+        return m_comportements;
+    }
 }

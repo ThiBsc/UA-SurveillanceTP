@@ -91,13 +91,15 @@ public class SplitPane extends JSplitPane {
 			public void mouseClicked(MouseEvent e){
 				if(e.getButton()== MouseEvent.BUTTON1){
 					System.out.println("la ligne sélectionné est: "+tableauExamen.getSelectedRow());
-					// quand on clique sur un exam
-					// on fait la requete pour savoir ses comportements suspects
+					// quand on cliqu sur un exam
+					// on fai la requte pour savoir ses comportements suspects
 					// puis on les ajoute dans l'examen (l'objet)
 					// et on les affiche dans le tableauModelComportement
 					tableauModelComportementSuspect.resetmodel();
 					int id = tableauModelExamen.getObjectTAt(tableauExamen.getSelectedRow()).getId();
 					ArrayList<ComportementSuspect> c = conn.allSuspect(id);
+					
+//					ArrayList<ComportementSuspect> c = tableauModelExamen.getObjectTAt(tableauExamen.getSelectedRow()).getComportementsSuspects();
 					for(ComportementSuspect i: c){
 						tableauModelComportementSuspect.addValue(i);
 					}
@@ -119,7 +121,7 @@ public class SplitPane extends JSplitPane {
 		if(SplitPane.m_splitpane == null){
 			synchronized(SplitPane.class){
 				SplitPane.m_splitpane = new SplitPane();
-				SplitPane.m_splitpane.setResizeWeight(0.75); //Pour la répartition de la taille des 2 panneaux 
+				SplitPane.m_splitpane.setResizeWeight(0.75); //Pour la répartition de la taille des 2 panneaux
 			}
 		}
 		return SplitPane.m_splitpane;

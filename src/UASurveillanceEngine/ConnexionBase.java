@@ -104,7 +104,7 @@ public class ConnexionBase {
 				cs = new ComportementSuspect(rs.getString("etu_nom"), rs.getString("etu_prenom"), rs.getString("EVENEMENT_type"));
 				listComp.add(cs);
 			}
-		}	
+		}
 		catch(SQLException e){
 			e.printStackTrace();
 		}
