@@ -18,7 +18,7 @@ public class Window extends JFrame {
     {
 		layout = new BorderLayout();
 		menubar = new MenuBar();
-		splitPane = SplitPane.getInstance();
+		splitPane = new SplitPane();
 		status = new StatusBar();
 		status.setStatus(StatusType.INFO, "Surveillance TP");
         initUI();

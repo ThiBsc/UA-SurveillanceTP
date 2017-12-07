@@ -30,21 +30,17 @@ public class TableauModelExamen extends TableauModel<Examen> {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		switch (columnIndex) {
-        case 0:
-//            return getColumnName(columnIndex);
-            return _dataList.get(rowIndex).getDate();
-        case 1:
-//            return getColumnName(columnIndex);
-            return _dataList.get(rowIndex).getPromotion();
-        case 2:
-//            return getColumnName(columnIndex);
-            return _dataList.get(rowIndex).getMatiere();
-        case 3:
-//            return getColumnName(columnIndex);
-            return _dataList.get(rowIndex).getDuree();
-        default:
-            return "";
-    }
+			case 0:
+				return getColumnName(columnIndex);
+			case 1:
+				return getColumnName(columnIndex);
+			case 2:
+				return getColumnName(columnIndex);
+			case 3:
+				return getColumnName(columnIndex);
+			default:
+				return "";
+		}
 	}
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
