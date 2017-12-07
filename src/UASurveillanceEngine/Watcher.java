@@ -137,8 +137,8 @@ public abstract class Watcher extends Thread {
 		/**
 		 * NetworkWatcher
 		 */
-		NetworkWatcherHistoryChrome nwhc = new NetworkWatcherHistoryChrome("/home/thibaut/.config/google-chrome/Default/History");
-		NetworkWatcherHistoryMozilla nwhm = new NetworkWatcherHistoryMozilla("~/.mozilla/firefox/ugm37j7z.default-1462882570889/places.sqlite");
+		NetworkWatcherHistoryChrome nwhc = new NetworkWatcherHistoryChrome(home_path + "/.config/google-chrome/Default/History");
+		NetworkWatcherHistoryMozilla nwhm = new NetworkWatcherHistoryMozilla(home_path + "/.mozilla/firefox/ugm37j7z.default-1462882570889/places.sqlite");
 		NetworkWatcherTCP nwtcp = new NetworkWatcherTCP();
 		/**
 		 * USBWatcher

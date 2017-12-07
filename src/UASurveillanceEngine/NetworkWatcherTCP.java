@@ -36,7 +36,7 @@ public class NetworkWatcherTCP extends NetworkWatcher {
 		String tcpdumpCmdResponse = "";
 		ProcessBuilder constructionProcess = null;
 		
-		constructionProcess = new ProcessBuilder("tcpdump","-c 100","udp","dst port 53","-tttt");
+		constructionProcess = new ProcessBuilder("tcpdump","-c 25","udp", "-tttt");
 		
  
 		constructionProcess.redirectErrorStream(true);
@@ -68,8 +68,9 @@ public class NetworkWatcherTCP extends NetworkWatcher {
 	 * redirigé vers un fichier.
 	 */
 	private String getStringFromStream(InputStream recupFluxDonnee) throws IOException {
+		String renvoi="";
+		
 		if (recupFluxDonnee != null) {
-			String renvoi="";
 			
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(recupFluxDonnee))) {
 			    String line = null;
@@ -78,10 +79,10 @@ public class NetworkWatcherTCP extends NetworkWatcher {
 			    	String[] ligneSplit = line.split(" ");
 			    	if(ligneSplit.length == 10){
 			    		if(numeroLigne > 1){
-					    	String value ="";
-					    	value ="Date : " +  ligneSplit[0] + " Heure: " + ligneSplit[1] + " Site: " + ligneSplit[8];
-					    	// sendEvent(ligneSplit[8]);
-					    	renvoi = renvoi + value;
+//					    	String value ="";
+//					    	value ="Date : " +  ligneSplit[0] + " Heure: " + ligneSplit[1] + " Site: " + ligneSplit[8];
+					    	sendEvent(ligneSplit[8]);
+//					    	renvoi = renvoi + value;
 			    		}
 			    		numeroLigne++;
 			    	}
@@ -91,9 +92,8 @@ public class NetworkWatcherTCP extends NetworkWatcher {
 			} catch (IOException e) {
 			    e.printStackTrace();
 			}
-			 return renvoi;	
-		} else {
-			return "";
 		}
+		
+		return renvoi;
 	}
 }
