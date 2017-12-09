@@ -2,7 +2,6 @@ package UASurveillanceEngine;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -96,10 +95,6 @@ public class NetworkWatcherHistoryChrome extends NetworkWatcherHistory {
 							System.out.println("Unable to connect database : Chrome");
 						}
 					} catch (SQLException e) {
-						System.err.println(e.getMessage());
-					} catch (UnknownHostException e) {
-						System.err.println(e.getMessage());
-					} catch (IOException e) {
 						System.err.println(e.getMessage());
 					}
 				}

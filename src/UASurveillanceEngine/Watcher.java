@@ -52,39 +52,55 @@ public abstract class Watcher extends Thread {
 	 * @throws IOException 
 	 * @throws UnknownHostException 
 	 */
-	public void sendEvent(String msg) throws UnknownHostException, IOException {
+	public void sendEvent(String msg) {
 		if (canSendEvent()){
-			UASurveillanceIHMEtud.Window.getInstance().displayEventIsSending();
-			Date current_date = new Date();
-			socketEvent = new Socket(IP_SERVER, 3615);
-			DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
-			//writer = new PrintWriter(socketEvent.getOutputStream());
-			String event_info = type+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString()+"|"+msg;
-			byte[] event = event_info.getBytes("UTF-8");
-			dos.writeInt(event.length);
-			dos.write(event);
-			dos.flush();
-			System.err.println("Sending event: "+event_info);
-			dos.close();
-			socketEvent.close();
+			try {
+				UASurveillanceIHMEtud.Window.getInstance().displayEventIsSending();
+				Date current_date = new Date();
+				socketEvent = new Socket(IP_SERVER, 3615);
+				DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
+				//writer = new PrintWriter(socketEvent.getOutputStream());
+				String event_info = type+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString()+"|"+msg;
+				byte[] event = event_info.getBytes("UTF-8");
+				dos.writeInt(event.length);
+				dos.write(event);
+				dos.flush();
+				System.err.println("Sending event: "+event_info);
+				dos.close();
+				socketEvent.close();
+			} catch (UnknownHostException e) {
+				// Si on n'arrive pas à joindre l'host alors on le fait savoir à l'IHM etudiante
+				UASurveillanceIHMEtud.Window.getInstance().setErreur_connexion_serveur("Impossible de se connecter à " + Watcher.IP_SERVER + ". Vérifier l'adresse IP.");
+			} catch (IOException e) {
+				// S'il y a une erreur, on le fait savoir
+				UASurveillanceIHMEtud.Window.getInstance().setErreur_connexion_serveur(e.getMessage() + " IP: "+ Watcher.IP_SERVER );
+			}
 		}
 	}
 	
-	public void sendEventData(int size, byte[] data) throws UnknownHostException, IOException{
-		if (canSendEvent()){
-			Date current_date = new Date();
-			socketEvent = new Socket(IP_SERVER, 3615);
-			DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
-			//writer = new PrintWriter(socketEvent.getOutputStream());
-			String event_info = type+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString();
-			byte[] event = event_info.getBytes("UTF-8");
-			dos.writeInt(event.length);
-			dos.write(event);
-			dos.writeInt(size);
-			dos.write(data);
-			dos.flush();
-			dos.close();
-			socketEvent.close();
+	public void sendEventData(int size, byte[] data) {
+		try {
+			if (canSendEvent()){
+				Date current_date = new Date();
+				socketEvent = new Socket(IP_SERVER, 3615);
+				DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
+				//writer = new PrintWriter(socketEvent.getOutputStream());
+				String event_info = type+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString();
+				byte[] event = event_info.getBytes("UTF-8");
+				dos.writeInt(event.length);
+				dos.write(event);
+				dos.writeInt(size);
+				dos.write(data);
+				dos.flush();
+				dos.close();
+				socketEvent.close();
+			}
+		} catch (UnknownHostException e) {
+			// Si on n'arrive pas à joindre l'host alors on le fait savoir à l'IHM etudiante
+			UASurveillanceIHMEtud.Window.getInstance().setErreur_connexion_serveur("Impossible de se connecter à " + Watcher.IP_SERVER + ". Vérifier l'adresse IP.");
+		} catch (IOException e) {
+			// S'il y a une erreur, on le fait savoir
+			UASurveillanceIHMEtud.Window.getInstance().setErreur_connexion_serveur(e.getMessage() + " IP: "+ Watcher.IP_SERVER );
 		}
 	}
 	

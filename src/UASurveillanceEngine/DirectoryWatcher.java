@@ -1,24 +1,26 @@
 package UASurveillanceEngine;
 
-import java.util.Vector;
-import static java.nio.file.StandardWatchEventKinds.*;
-import java.io.IOException;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Date;
+import java.util.Vector;
 
 
 /**
@@ -35,7 +37,7 @@ public class DirectoryWatcher extends Watcher {
 	/**
 	 * Le changement de taille autorisé entre deux enregistrements de fichier en bytes
 	 */
-	public static final long AUTHORIZED_FILE_SIZE_CHANGE = 256;
+	public static long AUTHORIZED_FILE_SIZE_CHANGE = 256;
 	
 	private static final String ALERT_SUSPECT_SAVED = "/!\\ ALERT_SUSPECT_SAVED: %s vient d'augmenter la taille du fichier %s de %d bytes.\n";
 	
@@ -49,14 +51,6 @@ public class DirectoryWatcher extends Watcher {
 	 * La liste des dossiers à watcher
 	 */
 	private Vector<Path> directoryList;
-
-    /**
-     * Partie temporaire en attendant la bdd
-     */
-	private Vector<String> changeTypes;
-	private Vector<Path> changePaths;
-	private Vector<Long> changeSizes;
-	private Vector<String> changeTimes;
 	 
 	/**
 	 * ===========================================================================
@@ -79,13 +73,6 @@ public class DirectoryWatcher extends Watcher {
         	walkAndRegisterDirectories(this.directoryList.get(i)); 
         }
         
-        /**
-         * Partie temporaire en attendant la bdd
-         */
-        this.changeTypes = new Vector<String>();
-        this.changePaths = new Vector<Path>();
-        this.changeSizes = new Vector<Long>();
-        this.changeTimes = new Vector<String>();
 	}
 	 
 	/**
@@ -93,26 +80,6 @@ public class DirectoryWatcher extends Watcher {
 	 * Getters et Setters
 	 * ===========================================================================
 	 */
-
-	/**
-	 * Renvoie la liste des dossiers watchés
-	 */
-	public String toString() {
-		String result = "";
-		String hostname;
-		try {
-			hostname = InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-			hostname = "(erreur hostname)";
-		}
-		
-		result += "\n - Liste des dossiers watchés (les sous dossiers le sont aussi) pour l'ordinateur " + hostname + ":\n";
-		for (int i=0; i < this.directoryList.size(); i++) {
-			result += this.directoryList.get(i) + "\n";
-		}
-		
-		return result;
-	}
 
 	/**
 	 * @param dir
@@ -173,22 +140,11 @@ public class DirectoryWatcher extends Watcher {
      */
     private long sizeFileDifference(String type, Path fullPath, Long size, String time) {
     	
-    	/**
-    	 * Partie temporaire en attendant l'utilisation de la bdd
-    	 */
-    	// On récupère l'index du dernier enregistrement du fichier
-    	int index = this.changePaths.lastIndexOf(fullPath);
+    	// On récupère le dernier enregistrement du fichier
     	
-    	// Si le fichier est enregistré dans notre "bdd"
-    	if (index != -1) {
-    			return size - this.changeSizes.get(index);
-    	}
-    	
-    	/**
-    	 * fin de partie temporaire
-    	 */
+    	// Si le fichier est enregistré dans notre "bdd" on renvoie la différence de taille entre les deux
     	 
-    	// Le fichier n'est pas enregistré
+    	// Si le fichier n'est pas enregistré on renvoie 0
     	return 0;
     }
 
@@ -233,7 +189,6 @@ public class DirectoryWatcher extends Watcher {
                 Path name = ((WatchEvent<Path>)event).context();
                 Path child = dir.resolve(name);
                 
-                /*======================================================================================================*/
                 /* Zone du traitement des fichiers cachés.
                  * On ne veut pas afficher les fichiers cachés, ou les fichiers qui sont dans des dossiers cachés.
                  * Par exemple : pas de fichiers de cache, ...
@@ -286,22 +241,13 @@ public class DirectoryWatcher extends Watcher {
                 	}
                 	
                 	// Dans tous les cas, on envoit le changement
-                	// Caractère à échaper -> | si jamais le fichier le contient
-                	String escape_char = "|";
                 	String delimiter = ";";
                 	String info_changes_text =
                 			type + delimiter
                 			+ fullPath + delimiter
                 			+ size;
-            		try {
-						sendEvent(info_changes_text);
-					} catch (UnknownHostException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+                	
+            		sendEvent(info_changes_text);
                 	
                 }     
                 /*======================================================================================================*/
@@ -331,32 +277,4 @@ public class DirectoryWatcher extends Watcher {
         }
 	}
 
-	public static void main(String[] args) {
-		// directoriesToWatch pourra être une variable static final
-		Vector <Path> directoriesToWatch = new Vector<Path>();
-		
-		//DatabaseSingleton db = new DatabaseSingleton();
-	
-		String usernameEtudiant = "etudiant";
-		// Variables à tester
-		// String usernameEtudiant = System.getProperty("user.name"); // Renvoie root ...
-		// String homeEtudiant = System.getProperty("user.home");
-		
-		// Pour tester j'ai mis le dossier du projet et celui de téléchargement
-		directoriesToWatch.add( Paths.get("/home/"+ usernameEtudiant +"/flicage_tp/") );
-		directoriesToWatch.add( Paths.get("/home/"+ usernameEtudiant +"/Téléchargements/") );
-		
-		DirectoryWatcher dW;
-		try {
-			dW = new DirectoryWatcher(directoriesToWatch);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		System.out.println("----- START -----");
-		System.out.println(dW.toString());
-		dW.start();
-	
-	}
-	
 }

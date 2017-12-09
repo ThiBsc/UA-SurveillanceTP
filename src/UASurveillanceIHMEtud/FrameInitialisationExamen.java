@@ -3,10 +3,7 @@ package UASurveillanceIHMEtud;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -23,19 +20,19 @@ public class FrameInitialisationExamen extends PopUp {
 	private JButton button_submit;
 	
 	private FrameInitialisationExamen() {
-		super(3);
+		super();
 		
 		label_exam_id = new JLabel("ID de l'examen");
 		field_exam_id = new JTextField();
 		button_submit = new JButton("Valider");
 		
-		initFrame();
-		initForm();		
+		initComponents();
+		putComponents();		
 		
 		this.setVisible(true);
 	}
 	
-	protected void initFrame() {
+	protected void initComponents() {
 
 		button_submit.addActionListener(new ActionListener(){ 
 			  public void actionPerformed(ActionEvent e) {
@@ -48,12 +45,12 @@ public class FrameInitialisationExamen extends PopUp {
 		
 	}
 	
-	protected void initForm() {
+	protected void putComponents() {
 		label_exam_id.setLabelFor(field_exam_id);
 		
-		addComponent(label_exam_id, 1, false);
-		addComponent(field_exam_id, 2, true);
-		addComponent(button_submit, 3, true);
+		addComponent(label_exam_id, false);
+		addComponent(field_exam_id, true);
+		addComponent(button_submit, true);
 	}
 	
 	public static FrameInitialisationExamen getInstance() {

@@ -1,8 +1,5 @@
 package UASurveillanceEngine;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class NetworkWatcherHistoryMozilla extends NetworkWatcherHistory {
@@ -56,12 +53,6 @@ public class NetworkWatcherHistoryMozilla extends NetworkWatcherHistory {
 				}
 			} catch (SQLException e) {
 				System.out.println(e);
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		} else {
 			System.out.println(_historyPath);

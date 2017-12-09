@@ -1,22 +1,10 @@
 package UASurveillanceEngine;
 
 
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.image.BufferedImage;
-
-import javax.imageio.ImageWriter;
-
-import java.awt.AWTException;
-import java.awt.Toolkit;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.Socket;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 

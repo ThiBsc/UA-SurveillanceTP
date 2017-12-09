@@ -2,6 +2,7 @@ package UASurveillanceIHMEtud;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,8 +26,12 @@ public class FrameInitialisation extends PopUp {
 	private JButton button_submit;
 	
 	private FrameInitialisation() {
-		super(9);
+		super();
 		
+		// Titre de la fenêtre
+		this.setTitle("Initialisation");
+		
+		// Instanciation des objets
 		label_etudiant_firstname = new JLabel("Prénom");
 		label_etudiant_lastname = new JLabel("Nom");
 		label_ip_serveur = new JLabel("IP du serveur distant");
@@ -38,19 +43,26 @@ public class FrameInitialisation extends PopUp {
 		field_exam_id = new JTextField();
 		button_submit = new JButton("Valider");
 		
-		initFrame();
-		initForm();
+		// Initialisation du ActionListener et construction du formulaire
+		initComponents();
+		putComponents();
 		
+		// On rend la frame visible
 		this.setVisible(true);
 	}
 
-	protected void initFrame() {
+	protected void initComponents() {
 
 		button_submit.addActionListener(new ActionListener(){ 
 			  public void actionPerformed(ActionEvent e) {
 				  
 				  // Si les champs sont valides
 				  if ( formulaireValide() ) {
+					  
+					  // On ferme la fenêtre
+					  FrameInitialisation.getInstance().dispose();
+					  
+					  // On ouvre la fenêtre principale
 					  Window window = Window.getInstance();
 					  
 					  // On met à jour les champs
@@ -58,20 +70,20 @@ public class FrameInitialisation extends PopUp {
 					  window.setEtud_nom(field_etudiant_lastname.getText());
 					  window.setExam_id(field_exam_id.getText());
 					  
+					  // On met à jour l'itnerface
+					  window.refreshUI();
+					  
+					  // Si l'ip est vide, on garde l'ip par défaut / pour les test : 127.0.0.1
 					  String ip = field_ip_serveur.getText();
 					  if ( ip != null ) {
 						  UASurveillanceEngine.Watcher.IP_SERVER = ip;
 					  }
-					  
-					  // On rend l'UI visible
-					  window.refreshUI();
-					  window.setVisible(true);
+
+					  // On prévient la base qu'un étudiant vient de se connecter
+					  // sendEvent("APPLICATION"+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString()+"|"+"DECONNEXION");
 					  
 					  // On start les watchers
 					  UASurveillanceEngine.Watcher.startWatchers();
-					  
-					  // On ferme la fenêtre
-					  FrameInitialisation.getInstance().dispose();
 				  } else {
 					  // Message d'erreur
 					  JOptionPane.showMessageDialog(null, "Le formulaire n'est pas valide", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -81,26 +93,29 @@ public class FrameInitialisation extends PopUp {
 		
 	}
 	
-	protected void initForm() {
+	protected void putComponents() {
 		
+		// On attribut les labels aux textfields
 		label_etudiant_firstname.setLabelFor(field_etudiant_firstname);
 		label_etudiant_lastname.setLabelFor(field_etudiant_lastname);
 		label_exam_id.setLabelFor(field_exam_id);
 		label_ip_serveur.setLabelFor(field_ip_serveur);
 		
-		addComponent(label_etudiant_firstname, 1, false);
-		addComponent(field_etudiant_firstname, 2, true);
-		addComponent(label_etudiant_lastname, 3, false);
-		addComponent(field_etudiant_lastname, 4, true);
-		addComponent(label_exam_id, 5, false);
-		addComponent(field_exam_id, 6, true);
-		addComponent(label_ip_serveur, 7, false);
-		addComponent(field_ip_serveur, 8, true);
-		addComponent(button_submit, 9, true);
+		// On laisse à la fonction de la classe abstraite le soin de placer les composants
+		addComponent(label_etudiant_firstname, false);
+		addComponent(field_etudiant_firstname, true);
+		addComponent(label_etudiant_lastname, false);
+		addComponent(field_etudiant_lastname, true);
+		addComponent(label_exam_id, false);
+		addComponent(field_exam_id, true);
+		addComponent(label_ip_serveur, false);
+		addComponent(field_ip_serveur, true);
+		addComponent(button_submit, true);
 		
 	}
 	
 	public static FrameInitialisation getInstance() {
+		// Mécanisme de Singleton
 		if ( instance == null ) {
 			instance = new FrameInitialisation();
 		} else {
@@ -110,9 +125,10 @@ public class FrameInitialisation extends PopUp {
 	}
 	
 	private boolean formulaireValide() {
+		// Nom prénom -> suite de lettres, espace autorisé mais commence par une lettre
 		return
-				field_etudiant_firstname.getText().matches("\\w+") &&
-				field_etudiant_lastname.getText().matches("\\w+") &&
+				field_etudiant_firstname.getText().matches("\\w(\\w| )+") &&
+				field_etudiant_lastname.getText().matches("\\w(\\w| )+") &&
 				field_exam_id.getText().matches("\\d+")
 		;
 	}

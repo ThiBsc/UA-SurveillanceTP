@@ -3,12 +3,13 @@ package UASurveillanceIHMEtud;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import UASurveillanceEngine.Watcher;
 
@@ -16,7 +17,12 @@ public class Window extends JFrame {
 
 	private static final long serialVersionUID = -5086125816507692170L;
 
+	// Singleton
 	static Window instance;
+	
+	// Permet de récupérer les erreurs de connexion au serveur
+	private String erreur_connexion_serveur;
+
 	// Envoie = vert
 	private final Color color_sending = new Color(0, 255, 0);
 	// Attente = jaune
@@ -28,37 +34,34 @@ public class Window extends JFrame {
 	private final int horizontal_margin = 10;
 	private final int vertical_margin = 10;
 	private final int size_temoin_envoie = 130;
-	
 	private String etud_nom;
 	private String etud_prenom;
 	private String exam_id;
 
-	private JLabel label_examen;
-	private BorderLayout layout;
-	
+	// Components
+	private JLabel label_bottom;
 	private JPanel main_panel;
 	private JLabel label_etudiant;
 	private JPanel temoin_envoie;
-	
 	private MenuBar menuBar;
 	
+	// Constructeur
 	private Window()
     {
-		layout = new BorderLayout();
-		label_examen = new JLabel();
+		// Composants
+		label_bottom = new JLabel();
 		main_panel = new JPanel();
 		temoin_envoie = new JPanel();
 		label_etudiant = new JLabel();
 		menuBar = new MenuBar();
 		
-		// On initialise les paramètres
-		FrameInitialisation.getInstance();
-		
         initUI();
+        
+        setVisible(true);
     }
 	
 	private void initUI() {
-		setLayout(layout);
+		setLayout(new BorderLayout());
 		setTitle("UA-SurveillanceTP");
 		
 	    // Taille de la frame
@@ -70,17 +73,35 @@ public class Window extends JFrame {
 	    // Resizable ou non
 	    setResizable(false);
         
-        // Action a la fermeture (croix)
-        // TODO
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // Avertissement à la fermeture
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+	    this.addWindowListener(new WindowAdapter() {
+	        @Override
+	        public void windowClosing(WindowEvent we)
+	        { 
+	            String warning_text = "<html>";
+		            warning_text += "Êtes-vous sûr de vouloir quitter l'application ?<br>";
+		            warning_text += "<i>Le professeur sera averti</i>";
+	            warning_text += "</html>";
+	            
+	            int PromptResult = JOptionPane.showConfirmDialog( null, warning_text, "Vous allez quitter l'application", JOptionPane.WARNING_MESSAGE );
+	            
+	            if(PromptResult==JOptionPane.YES_OPTION)
+	            {
+	            	// Si L'utilisateur est sûr de vouloir quitter alors on prévient le serveur et on arrête tout
+	            	// sendEvent("APPLICATION"+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString()+"|"+"DECONNEXION");
+	                System.exit(0);
+	            }
+	        }
+	    });
 
-	    label_examen.setHorizontalAlignment(JLabel.CENTER);
+	    label_bottom.setHorizontalAlignment(JLabel.CENTER);
 	    
 	    initMainPanel();
 	    
         add(main_panel, BorderLayout.CENTER);
         add(menuBar, BorderLayout.NORTH);
-        add(label_examen, BorderLayout.SOUTH);
+        add(label_bottom, BorderLayout.SOUTH);
 	}
 	
 	private void initMainPanel() {
@@ -125,7 +146,7 @@ public class Window extends JFrame {
 
 	public void refreshUI() {
         label_etudiant.setText(  etud_prenom + " " + etud_nom.toUpperCase() );
-		label_examen.setText( "Vous participez à l'examen n°" + exam_id );	
+		label_bottom.setText( "Vous participez à l'examen n°" + exam_id );	
 	}
 	
 	public void displayEventIsSending() {
@@ -176,6 +197,12 @@ public class Window extends JFrame {
 		this.exam_id = exam_id;
 		
 	}
+
+	public void setErreur_connexion_serveur(String erreur_connexion_serveur) {
+		this.erreur_connexion_serveur = erreur_connexion_serveur;
+		label_bottom.setText(erreur_connexion_serveur);
+//		label_etudiant.setText(erreur_connexion_serveur);
+	}
 	
 	public static Window getInstance() {
 		if (instance == null) {
@@ -186,7 +213,7 @@ public class Window extends JFrame {
 	
     public static void main(String[] args)
     {
-        Window window = Window.getInstance();
+        FrameInitialisation frame_init = FrameInitialisation.getInstance();
     }
 
 }
