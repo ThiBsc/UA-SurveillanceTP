@@ -60,7 +60,7 @@ public class SplitPane extends JSplitPane {
 		scrollComportementSuspect = new JScrollPane(tableauComportementSuspect);
 		
 		tabbedPane.addTab("Comportements suspects", scrollComportementSuspect);
-		tabbedPane.addTab("Vidéos", p1);
+//		tabbedPane.addTab("Vidéos", p1);
 		
 		
 		ChangeListener changeListener = new ChangeListener() {
