@@ -1,6 +1,5 @@
 package UASurveillanceEngine;
 
-import java.io.IOException;
 
 public abstract class NetworkWatcher extends Watcher{
 	

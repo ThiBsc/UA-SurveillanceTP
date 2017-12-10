@@ -1,6 +1,7 @@
 package UASurveillanceIHM;
 
 
+
 public class TableauModelExamen extends TableauModel<Examen> {
 	
 	private static final long serialVersionUID = 2575720868941743197L;

@@ -1,9 +1,6 @@
 package UASurveillanceIHM;
 
-import java.sql.*;
-import java.util.ArrayList;
-
-import UASurveillanceEngine.*;
+import java.sql.ResultSet;
 
 
 public class Examen {

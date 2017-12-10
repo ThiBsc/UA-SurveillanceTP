@@ -1,19 +1,15 @@
-package UASurveillanceEngine;
+package UASurveillanceIHM;
 
 import java.sql.Connection;
-
-/**
- * @author thibaut & Victoria
- */
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+/**
+ * @author thibaut & Victoria
+ */
 
-import UASurveillanceIHM.ComportementSuspect;
-import UASurveillanceIHM.Examen;
 
 public class ConnexionBase {
 
@@ -41,7 +37,7 @@ public class ConnexionBase {
 	public static ConnexionBase getInstance(){
 		if (uniqueInstance==null){
 			try {
-				uniqueInstance=new ConnexionBase("127.0.0.1", "UA-user", "ua-user");
+				uniqueInstance=new ConnexionBase("127.0.0.1", "user", "user");
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -99,9 +95,9 @@ public class ConnexionBase {
 		ArrayList<ComportementSuspect> listComp = new ArrayList<ComportementSuspect>();
 		ComportementSuspect cs;
 		try{
-			rs = query("SELECT etu_nom, etu_prenom, EVENEMENT_type FROM EXAMEN_has_EVENEMENT where EXAMEN_id = "+id+";");
+			rs = query("SELECT etu_nom, etu_prenom, EVENEMENT_type, other FROM EXAMEN_has_EVENEMENT where EXAMEN_id = "+id+";");
 			while (rs.next()){
-				cs = new ComportementSuspect(rs.getString("etu_nom"), rs.getString("etu_prenom"), rs.getString("EVENEMENT_type"));
+				cs = new ComportementSuspect(rs.getString("etu_nom"), rs.getString("etu_prenom"), rs.getString("EVENEMENT_type"), rs.getString("other"));
 				listComp.add(cs);
 			}
 		}	

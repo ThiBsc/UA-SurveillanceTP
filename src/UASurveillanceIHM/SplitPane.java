@@ -1,14 +1,10 @@
 package UASurveillanceIHM;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -16,7 +12,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import UASurveillanceEngine.ConnexionBase;
 
 
 public class SplitPane extends JSplitPane {
@@ -60,7 +55,7 @@ public class SplitPane extends JSplitPane {
 		scrollComportementSuspect = new JScrollPane(tableauComportementSuspect);
 		
 		tabbedPane.addTab("Comportements suspects", scrollComportementSuspect);
-		tabbedPane.addTab("Vidéos", p1);
+//		tabbedPane.addTab("Vidéos", p1);
 		
 		
 		ChangeListener changeListener = new ChangeListener() {
