@@ -27,7 +27,6 @@ public abstract class Watcher extends Thread {
 	private String type;
 	protected volatile boolean isRecording; //synchronized non autorisé
 	protected Socket socketEvent;
-	protected PrintWriter writer;
 	
 	/**
 	 * Default constructor
@@ -129,55 +128,6 @@ public abstract class Watcher extends Thread {
 	 */
 	public void stopRecording() {
 		this.isRecording=false;
-	}
-	
-	static public void startWatchers() {
-
-		/**
-		 * DirectoryWatcher
-		 */
-		// directoriesToWatch pourra être une variable static final
-		Vector <Path> directoriesToWatch = new Vector<Path>();	
-//		String home_path = System.getProperty("user.home");
-		String home_path = "/home/etudiant";
-		// Variables à tester
-		
-		// Pour tester j'ai mis le dossier du projet et celui de téléchargement
-		directoriesToWatch.add( Paths.get(home_path) );
-		DirectoryWatcher dw = null;
-		try {
-			dw = new DirectoryWatcher(directoriesToWatch);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		/**
-		 * NetworkWatcher
-		 */
-		NetworkWatcherHistoryChrome nwhc = new NetworkWatcherHistoryChrome(home_path + "/.config/google-chrome/Default/History");
-		NetworkWatcherHistoryMozilla nwhm = new NetworkWatcherHistoryMozilla(home_path + "/.mozilla/firefox/ugm37j7z.default-1462882570889/places.sqlite");
-		NetworkWatcherTCP nwtcp = new NetworkWatcherTCP();
-		/**
-		 * USBWatcher
-		 */
-		USBWatcher usbw = new USBWatcher();
-		/**
-		 * ScreenWatcher
-		 */
-		ScreenWatcher sw = new ScreenWatcher();
-		int screen_w, screen_h;
-		screen_w = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-		screen_h = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-		FFMpegRunner ffmpeg = new FFMpegRunner(screen_w, screen_h);
-		/**
-		 * Lancement des Threads
-		 */
-		dw.start();
-		nwhc.start();
-		nwhm.start();
-		nwtcp.start();
-		sw.start();
-		ffmpeg.start();
-		usbw.start();
 	}
 
 }

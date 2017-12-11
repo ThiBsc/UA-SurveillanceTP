@@ -3,14 +3,26 @@ package UASurveillanceIHMEtud;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import UASurveillanceEngine.DirectoryWatcher;
+import UASurveillanceEngine.FFMpegRunner;
+import UASurveillanceEngine.NetworkWatcherHistoryChrome;
+import UASurveillanceEngine.NetworkWatcherHistoryMozilla;
+import UASurveillanceEngine.NetworkWatcherTCP;
+import UASurveillanceEngine.ScreenWatcher;
+import UASurveillanceEngine.USBWatcher;
 import UASurveillanceEngine.Watcher;
 
 public class Window extends JFrame {
@@ -45,6 +57,10 @@ public class Window extends JFrame {
 	private JPanel temoin_envoie;
 	private MenuBar menuBar;
 	
+	// Watchers
+	private Vector<Watcher> watchers;
+	private FFMpegRunner ffmpeg;
+	
 	// Constructeur
 	private Window()
     {
@@ -54,6 +70,7 @@ public class Window extends JFrame {
 		temoin_envoie = new JPanel();
 		label_etudiant = new JLabel();
 		menuBar = new MenuBar();
+		watchers = new Vector<Watcher>();
 		
         initUI();
         
@@ -90,6 +107,7 @@ public class Window extends JFrame {
 	            {
 	            	// Si L'utilisateur est sûr de vouloir quitter alors on prévient le serveur et on arrête tout
 	            	// sendEvent("APPLICATION"+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString()+"|"+"DECONNEXION");
+	            	stopWatchers();
 	                System.exit(0);
 	            }
 	        }
@@ -209,6 +227,69 @@ public class Window extends JFrame {
 			instance = new Window();
 		}
 		return instance;		
+	}
+	
+	public void startWatchers(){
+		/**
+		 * DirectoryWatcher
+		 */
+		// directoriesToWatch pourra être une variable static final
+		Vector <Path> directoriesToWatch = new Vector<Path>();	
+//		String home_path = System.getProperty("user.home");
+		String home_path = "/home/etudiant";
+		// Variables à tester
+		
+		// Pour tester j'ai mis le dossier du projet et celui de téléchargement
+		directoriesToWatch.add( Paths.get(home_path) );
+		DirectoryWatcher dw = null;
+		try {
+			watchers.add(new DirectoryWatcher(directoriesToWatch));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		/**
+		 * NetworkWatcher
+		 */
+		watchers.add(new NetworkWatcherHistoryChrome(home_path + "/.config/google-chrome/Default/History"));
+		watchers.add(new NetworkWatcherHistoryMozilla(home_path + "/.mozilla/firefox/ugm37j7z.default-1462882570889/places.sqlite"));
+		watchers.add(new NetworkWatcherTCP());
+		/**
+		 * USBWatcher
+		 */
+		watchers.add(new USBWatcher());
+		/**
+		 * ScreenWatcher
+		 */
+		watchers.add(new ScreenWatcher());
+		int screen_w, screen_h;
+		screen_w = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+		screen_h = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+		ffmpeg = new FFMpegRunner(screen_w, screen_h);
+		/**
+		 * Lancement des Threads
+		dw.start();
+		nwhc.start();
+		nwhm.start();
+		nwtcp.start();
+		sw.start();
+		ffmpeg.start();
+		usbw.start();
+		 */
+		for (Watcher w : watchers){
+			w.start();
+		}
+		ffmpeg.start();
+	}
+	
+	public void stopWatchers(){
+		for (Watcher w : watchers){
+			if (w instanceof ScreenWatcher){
+				String duration = ffmpeg.stop_ffmpeg();
+				w.sendEvent("MOVIE_DURATION;"+duration);
+				ffmpeg = null;
+			}
+			w.stopRecording();
+		}
 	}
 	
     public static void main(String[] args)

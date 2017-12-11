@@ -83,7 +83,7 @@ public class FrameInitialisation extends PopUp {
 					  // sendEvent("APPLICATION"+"|"+EXAMEN_id+"|"+ETU_NOM+"|"+ETU_PRENOM+"|"+current_date.toString()+"|"+"DECONNEXION");
 					  
 					  // On start les watchers
-					  UASurveillanceEngine.Watcher.startWatchers();
+					  window.startWatchers();
 				  } else {
 					  // Message d'erreur
 					  JOptionPane.showMessageDialog(null, "Le formulaire n'est pas valide", "Erreur", JOptionPane.ERROR_MESSAGE);
