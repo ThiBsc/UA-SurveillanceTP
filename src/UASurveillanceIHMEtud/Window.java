@@ -218,7 +218,7 @@ public class Window extends JFrame {
 
 	public void setErreur_connexion_serveur(String erreur_connexion_serveur) {
 		this.erreur_connexion_serveur = erreur_connexion_serveur;
-		label_bottom.setText(erreur_connexion_serveur);
+		label_bottom.setText(this.erreur_connexion_serveur);
 //		label_etudiant.setText(erreur_connexion_serveur);
 	}
 	

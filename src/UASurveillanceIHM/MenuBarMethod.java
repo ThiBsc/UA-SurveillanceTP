@@ -29,13 +29,15 @@ public class MenuBarMethod implements ActionListener {
 		if (e.getActionCommand().equals("ajout")){
 			
 	        JPanel panel = new JPanel(new GridLayout(0, 1));
-	        JLabel daEx = new JLabel("Date Examen");
+	        JLabel daEx = new JLabel("Date Examen (jj-mm-aaaa)");
 			JTextField dateExam = new JTextField();
-			JLabel clEx = new JLabel("Classe Examen");
+			JLabel ens = new JLabel("ID Enseignant");
+			JTextField enseignant = new JTextField();
+			JLabel clEx = new JLabel("ID Classe Examen");
 			JTextField classeExam = new JTextField();
-			JLabel maEx = new JLabel("Matière Examen");
+			JLabel maEx = new JLabel("ID Matière Examen");
 			JTextField matiereExam = new JTextField();
-			JLabel duEx = new JLabel("Durée Examen");
+			JLabel duEx = new JLabel("Durée Examen (chaine de caractères)");
 			JTextField dureeExam = new JTextField();
 			dateExam.setColumns(10);
 			classeExam.setColumns(20);
@@ -44,6 +46,8 @@ public class MenuBarMethod implements ActionListener {
 	 
 			panel.add(daEx);
 			panel.add(dateExam);
+			panel.add(ens);
+			panel.add(enseignant);
 			panel.add(clEx);
 			panel.add(classeExam);
 			panel.add(maEx);
@@ -58,9 +62,11 @@ public class MenuBarMethod implements ActionListener {
 				String dateExamen = dateExam.getText();
 				int classeExamen = Integer.parseInt(classeExam.getText());
 				int matiereExamen = Integer.parseInt(matiereExam.getText());
+				int idenseignant = Integer.parseInt(enseignant.getText());
 				String dureeExamen = dureeExam.getText();
 			
-				
+				ConnexionBase.getInstance().addToDB(new Examen(dateExamen, dureeExamen, idenseignant, matiereExamen, classeExamen));
+				SplitPane.getInstance().resetDisplay();
 			}
 
 			

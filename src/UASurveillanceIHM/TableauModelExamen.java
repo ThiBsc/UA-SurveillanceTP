@@ -12,17 +12,19 @@ public class TableauModelExamen extends TableauModel<Examen> {
 	
 	@Override
 	public int getColumnCount() {
-		return 4;
+		return 5;
 	}
 	public String getColumnName(int columnIndex) {
 		switch (columnIndex) {
 			case 0:
-				return "Date";
+				return "ID";
 			case 1:
-				return "Classe";
+				return "Date";
 			case 2:
-				return "Matière";
+				return "Classe";
 			case 3:
+				return "Matière";
+			case 4:
 				return "Durée";
 			default:
 				return "";
@@ -31,16 +33,18 @@ public class TableauModelExamen extends TableauModel<Examen> {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		switch (columnIndex) {
-        case 0:
-//            return getColumnName(columnIndex);
-            return _dataList.get(rowIndex).getDate();
+		case 0:
+			return _dataList.get(rowIndex).getId();
         case 1:
 //            return getColumnName(columnIndex);
-            return _dataList.get(rowIndex).getProm_id();
+            return _dataList.get(rowIndex).getDate();
         case 2:
 //            return getColumnName(columnIndex);
-            return _dataList.get(rowIndex).getMat_id();
+            return _dataList.get(rowIndex).getProm_id();
         case 3:
+//            return getColumnName(columnIndex);
+            return _dataList.get(rowIndex).getMat_id();
+        case 4:
 //            return getColumnName(columnIndex);
             return _dataList.get(rowIndex).getDuree();
         default:
