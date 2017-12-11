@@ -55,7 +55,7 @@ public class MenuBar extends JMenuBar {
 			public void actionPerformed(ActionEvent arg0) {
 				String text_html = "";
 				text_html += "<html>";
-					text_html += "Lorsque cela est nécessaire, le programme dialogue avec un serveur et lui envoie des données relatives à votre activité.<br>";
+					text_html += "Lorsque cela est nécessaire, le programme envoie des données relatives à votre activité à un serveur.<br>";
 					text_html += "Le voyant devient alors vert.";
 				text_html += "</html>";
 				// On renseigne sur quoi les étudiants sont surveillés
