@@ -5,6 +5,7 @@ Projet surveillance de séance de TP
 ### Les librairies à importer
 * [Maria-DB](https://downloads.mariadb.com/Connectors/java/connector-java-2.2.0/mariadb-java-client-2.2.0.jar)
 * [Sqlite](https://bitbucket.org/xerial/sqlite-jdbc/downloads/sqlite-jdbc-3.21.0.jar)
+* Icons - www.aha-soft.com
 
 ### Processus à installer
 * [ffmpeg](apt://ffmpeg) - enregistrement vidéo

@@ -63,63 +63,68 @@ public class EventReceiver extends Thread {
 				dis.read(line_byte);
 				
 				String line = new String(line_byte, "UTF-8");
-				String type = line.split("\\|")[0];
-				int exam_id = Integer.parseInt(line.split("\\|")[1]);
-				String nom = line.split("\\|")[2];
-				String prenom = line.split("\\|")[3];
-				
-				// treatment
-				if (type.equals("USB") || type.equals("DIRECTORY") || type.equals("NETWORK")){
-					String other = line.split("\\|")[5];
+				String[] tabLine = line.split("\\|");
+				if (tabLine.length == 5 || tabLine.length == 6){
+					String type = tabLine[0];
+					int exam_id = Integer.parseInt(tabLine[1]);
+					String nom = tabLine[2];
+					String prenom = tabLine[3];
 					
-					// values (id_exam, type, nom, prenom, date, other)
-					String insert_format = "insert into EXAMEN_has_EVENEMENT " +
-							"(EXAMEN_id, EVENEMENT_type, etu_nom, etu_prenom, date, other) " +
-							"values (%d, \"%s\", \"%s\", \"%s\", current_timestamp, \"%s\");";
-					System.out.println(line);
-					try {
-						bdd.insert(String.format(insert_format, exam_id, type, nom, prenom, other));
-					} catch (Exception e) {
-						System.err.println(e.getMessage());
-					}
-				} else if (type.equals("SCREEN")){
-					String VIDEO_PATH_nom = video_path+exam_id+"_"+nom+"_"+prenom;
-					if (line.contains("MOVIE_DURATION")){
-						String other = line.split("\\|")[5];
-						String duration = other.split(";")[1];
-						// ffmpeg -i tonfichier.avi -t 0:00:19.41 -c:v copy -c:a copy -c:s copy out.mp4
-						ProcessBuilder pb = new ProcessBuilder(String.format("ffmpeg -i %s -t %s -c:v copy -c:a copy -c:s copy %s",
-								VIDEO_PATH_nom+"_tmp.avi", duration, VIDEO_PATH_nom+".avi").split("\\s+"));
-						Process finaliser = pb.start();
+					// treatment
+					if (type.equals("USB") || type.equals("DIRECTORY") || type.equals("NETWORK")){
+						String other = tabLine[5];
+						
+						// values (id_exam, type, nom, prenom, date, other)
+						String insert_format = "insert into EXAMEN_has_EVENEMENT " +
+								"(EXAMEN_id, EVENEMENT_type, etu_nom, etu_prenom, date, other) " +
+								"values (%d, \"%s\", \"%s\", \"%s\", current_timestamp, \"%s\");";
+						System.out.println(line);
 						try {
-							finaliser.waitFor();
-							System.out.println(type+" - "+VIDEO_PATH_nom+".avi is finalized with a time of "+duration);
-							File f = new File(VIDEO_PATH_nom+"_tmp.avi");
-							f.delete();
-						} catch (InterruptedException e) {
+							bdd.insert(String.format(insert_format, exam_id, type, nom, prenom, other));
+						} catch (Exception e) {
 							System.err.println(e.getMessage());
+						}
+					} else if (type.equals("SCREEN")){
+						String VIDEO_PATH_nom = video_path+exam_id+"_"+nom+"_"+prenom;
+						if (line.contains("MOVIE_DURATION")){
+							String other = tabLine[5];
+							String duration = tabLine[1];
+							// ffmpeg -i tonfichier.avi -t 0:00:19.41 -c:v copy -c:a copy -c:s copy out.mp4
+							ProcessBuilder pb = new ProcessBuilder(String.format("ffmpeg -i %s -t %s -c:v copy -c:a copy -c:s copy %s",
+									VIDEO_PATH_nom+"_tmp.avi", duration, VIDEO_PATH_nom+".avi").split("\\s+"));
+							Process finaliser = pb.start();
+							try {
+								finaliser.waitFor();
+								System.out.println(type+" - "+VIDEO_PATH_nom+".avi is finalized with a time of "+duration);
+								File f = new File(VIDEO_PATH_nom+"_tmp.avi");
+								f.delete();
+							} catch (InterruptedException e) {
+								System.err.println(e.getMessage());
+							}
+						} else {
+							// "SCREEN|etudiantname"
+							String insert_format = "insert into EXAMEN_has_VIDEO_PATH " +
+									"(EXAMEN_id, VIDEO_PATH_nom, etu_nom, etu_prenom, create_date, etu_hostname, etu_ip) " +
+									"select * from (select %d, \"%s\", \"%s\", \"%s\", current_timestamp, \"\" as host, \"\" as ip) as tab " +
+									"where not exists (" +
+									"select EXAMEN_id from EXAMEN_has_VIDEO_PATH where EXAMEN_id=%d and etu_nom like \"%s\" and etu_prenom like \"%s\");";
+							try {
+								bdd.insert(String.format(insert_format, exam_id, "Test", nom, prenom, exam_id, nom, prenom));
+							} catch (SQLException e) {
+								System.err.println(e.getMessage());
+							}
+							int available = dis.readInt();
+							byte[] data = new byte[available];
+							FileOutputStream fos = new FileOutputStream(new File(VIDEO_PATH_nom+"_tmp.avi"), true);
+							dis.read(data);
+							fos.write(data);
+							fos.close();
 						}
 					} else {
-						// "SCREEN|etudiantname"
-						String insert_format = "insert into EXAMEN_has_VIDEO_PATH " +
-								"(EXAMEN_id, VIDEO_PATH_nom, etu_nom, etu_prenom, create_date, etu_hostname, etu_ip) " +
-								"select * from (select %d, \"%s\", \"%s\", \"%s\", current_timestamp, \"\" as host, \"\" as ip) as tab " +
-								"where not exists (" +
-								"select EXAMEN_id from EXAMEN_has_VIDEO_PATH where EXAMEN_id=%d and etu_nom like \"%s\" and etu_prenom like \"%s\");";
-						try {
-							bdd.insert(String.format(insert_format, exam_id, "Test", nom, prenom, exam_id, nom, prenom));
-						} catch (SQLException e) {
-							System.err.println(e.getMessage());
-						}
-						int available = dis.readInt();
-						byte[] data = new byte[available];
-						FileOutputStream fos = new FileOutputStream(new File(VIDEO_PATH_nom+"_tmp.avi"), true);
-						dis.read(data);
-						fos.write(data);
-						fos.close();
+						System.err.println("Protocol not recognized.");
 					}
-				} else {
-					System.err.println("Protocol not recognized.");
+				} else { 
+					System.err.println("Invalid parameters.");
 				}
 			}
 		} catch (IOException e) {

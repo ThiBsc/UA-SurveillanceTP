@@ -294,7 +294,9 @@ public class Window extends JFrame {
 	
     public static void main(String[] args)
     {
-        FrameInitialisation frame_init = FrameInitialisation.getInstance();
+        //FrameInitialisation frame_init = FrameInitialisation.getInstance();
+    	UserExamenDialog ued = new UserExamenDialog();
+    	ued.showConfirmDialog();
     }
 
 }
