@@ -1,55 +1,52 @@
 package UASurveillanceEngine;
 
-import java.awt.Toolkit;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Date;
-import java.util.Vector;
 
-import UASurveillanceIHM.DatabaseSingleton;
+import serverEvent.DatabaseSingleton;
 
 
 /**
- * 
+ * Classe abstraite gérant les différents types d'évènements
  */
 public abstract class Watcher extends Thread {
 
+	/**
+	 * Variables de connexion à la base
+	 */
 	public static int EXAMEN_id = -1;
 	public static String ETU_NOM = null;
 	public static String ETU_PRENOM = null;
 	public static String IP_SERVER = "127.0.0.1";
+	protected DatabaseSingleton db;
 
+	/**
+	 * Variables communes a tous les watchers
+	 */
 	private String type;
 	protected volatile boolean isRecording; //synchronized non autorisé
 	protected Socket socketEvent;
 	
-	/**
-	 * Default constructor
-	 */
 	public Watcher(String type) {
+		// ctor
 		this.type = type;
 		isRecording = false;
 	}
 
 	/**
-	 * 
+	 * Pour savoir s'il est possible d'envoyer un évènement au serveur
+	 * @return TRUE si c'est possible, sinon FALSE
 	 */
-	protected DatabaseSingleton db;
-
 	private boolean canSendEvent(){
 		return EXAMEN_id != -1 && ETU_NOM != null && ETU_PRENOM != null;
 	}
 
 	/**
-	 * @param msg 
-	 * @return
-	 * @throws IOException 
-	 * @throws UnknownHostException 
+	 * Envoie au serveur le message d'information
+	 * @param msg
 	 */
 	public void sendEvent(String msg) {
 		if (canSendEvent()){
@@ -77,6 +74,11 @@ public abstract class Watcher extends Thread {
 		}
 	}
 	
+	/**
+	 * Envoie au serveur des byte
+	 * @param size - La taille de data à lire
+	 * @param data - Les data à lire
+	 */
 	public void sendEventData(int size, byte[] data) {
 		try {
 			if (canSendEvent()){
@@ -108,23 +110,19 @@ public abstract class Watcher extends Thread {
 	 * @return isRecording
 	 */
 	public boolean isRecording() {
-
 		return isRecording;
-
 	}
-	
 
 	/**
 	 * Modifie l'état de l'enregistrement
 	 * @param state l'état de l'enregistrement
 	 */
 	public void setRecording(boolean state) {
-
 		this.isRecording = state;
 	}
 
 	/**
-	 * 
+	 * Permet de stopper l'enregistrement
 	 */
 	public void stopRecording() {
 		this.isRecording=false;

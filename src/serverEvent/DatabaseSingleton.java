@@ -1,4 +1,4 @@
-package UASurveillanceIHM;
+package serverEvent;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,7 +8,7 @@ import java.sql.Statement;
 
 
 /**
- * 
+ * Classe Singleton de la connexion à la BDD
  */
 public class DatabaseSingleton {
 
@@ -25,16 +25,14 @@ public class DatabaseSingleton {
 	private String user;
 	private String psw;
 
-	/**
-	 * Default constructor
-	 */
 	private DatabaseSingleton() {
+		// ctor
 		url = "127.0.0.1";
 		user = psw = "";
 	}
 
 	/**
-	 * @return l'instance unique
+	 * @return l'instance unique de la connexion
 	 */
 	public static synchronized DatabaseSingleton getInstance() {
 		if (instance == null){
@@ -43,6 +41,12 @@ public class DatabaseSingleton {
 		return instance;
 	}
 
+	/**
+	 * Permet d'effectuer une requête à la BDD
+	 * @param sql - La requête
+	 * @return le ResultSet de la requête
+	 * @throws SQLException
+	 */
 	public ResultSet query(String sql) throws SQLException{
 		stmt = connect.createStatement();
 		ResultSet ret = stmt.executeQuery(sql);
@@ -50,6 +54,12 @@ public class DatabaseSingleton {
 		return ret;
 	}
 	
+	/**
+	 * Permet d'effectuer un "update" sur la BDD
+	 * @param sql - L'update
+	 * @return TRUE si l'update a fonctionné, sinon FALSE
+	 * @throws SQLException
+	 */
 	public boolean insert(String sql) throws SQLException{
 		boolean ret = false;
 		stmt = connect.createStatement();
@@ -58,6 +68,15 @@ public class DatabaseSingleton {
 		return ret;
 	}
 	
+	/**
+	 * Permet de lancer une connexion à la BDD
+	 * @param adresse - L'ip ou hostname de la BDD
+	 * @param usr - Le nom d'utilisateur de la BDD
+	 * @param db - Le nom de la base
+	 * @param mdp - Le mdp de l'utilisateur de la BDD
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	public void connect(String adresse, String usr, String db, String mdp) throws ClassNotFoundException, SQLException{
 		url = "jdbc:mysql://"+adresse+"/"+db;
 		user = usr;
@@ -66,6 +85,10 @@ public class DatabaseSingleton {
 		connect = DriverManager.getConnection(url, user, psw);
 	}
 	
+	/**
+	 * Permet de fermer la connexion
+	 * @throws SQLException
+	 */
 	public void disconnect() throws SQLException{
 		// stmt.close(); -> est fermé après chaque utilisation
 		connect.close();

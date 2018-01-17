@@ -9,18 +9,19 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import UASurveillanceIHM.DatabaseSingleton;
-
+/**
+ * Classe du serveur recevant tous les évènements pour les répartir correctement
+ */
 public class EventReceiver extends Thread {
 
 	/**
-	 * @param args
+	 * Variables du serveur
 	 */
-	
 	private ServerSocket ss;
 	private boolean running;
 
 	public EventReceiver(){
+		// ctor
 	}
 	
 	@Override
@@ -132,12 +133,19 @@ public class EventReceiver extends Thread {
 		}
 	}
 
+	/**
+	 * Méthode pour savoir si le serveur est en écoute
+	 * @return TRUE si oui, sinon FALSE
+	 */
 	public boolean isRunning() {
 		return running;
 	}
 
-	public void setRunning(boolean running) {
-		this.running = running;
+	/**
+	 * Permet de mettre fin à la thread du serveur
+	 */
+	public void stopRunning() {
+		this.running = false;
 	}
 	
 	public static void main(String[] args) {

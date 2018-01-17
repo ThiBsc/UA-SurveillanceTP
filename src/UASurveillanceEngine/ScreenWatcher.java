@@ -14,16 +14,12 @@ public class ScreenWatcher extends Watcher {
 	/**
 	 * ffmpeg -f x11grab -s 1920x1080 -i :0.0 -f avi pipe:1 > /tmp/videopipe
 	 * ffmpeg -f x11grab -s 1920x1080 -i :0.0 -vf scale=896:504 -f avi pipe:1 > /tmp/videopipe
-	 */
-	
+	 */	
 	private static final int width=640, height=480; // 16*9 -> 768*432
 
-	
-	/**
-	 * Default constructor
-	 */
 	public ScreenWatcher() {
 		super("SCREEN");
+		// ctor
 	}
 
 	@Override
