@@ -3,6 +3,7 @@ package UASurveillanceIHMEtud;
 import java.awt.GridLayout;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -57,8 +58,20 @@ public class UserExamenDialog extends JOptionPane {
 		panel.add(ip);
 	}
 
-	public int showConfirmDialog(){		
-		return super.showConfirmDialog(null, panel, "Connexion étudiant", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	public int showConfirmDialog(){
+		int ret = -1;
+		do {
+			ret = super.showConfirmDialog(null, panel, "Connexion étudiant", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+			if (ret == JOptionPane.OK_OPTION){
+				if ( !(prenom.getText().matches("\\w+")
+						&& nom.getText().matches("\\w+")
+						&& exam.getText().matches("\\d+")) ){
+					JOptionPane.showMessageDialog(null, "Le formulaire n'est pas valide", "Erreur", JOptionPane.ERROR_MESSAGE);
+					ret = -1;
+				}
+			}
+		} while (ret != JOptionPane.OK_OPTION && ret != JOptionPane.CANCEL_OPTION);
+		return ret;
 	}
 	
 	public String getPrenom(){

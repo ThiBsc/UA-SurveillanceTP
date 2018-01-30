@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
 
+import UASurveillanceIHMEtud.Window;
+
 import serverEvent.DatabaseSingleton;
 
 
@@ -21,6 +23,7 @@ public abstract class Watcher extends Thread {
 	public static String ETU_NOM = null;
 	public static String ETU_PRENOM = null;
 	public static String IP_SERVER = "127.0.0.1";
+	public static Window ihm = null;
 	protected DatabaseSingleton db;
 
 	/**
@@ -51,7 +54,7 @@ public abstract class Watcher extends Thread {
 	public void sendEvent(String msg) {
 		if (canSendEvent()){
 			try {
-				UASurveillanceIHMEtud.Window.getInstance().displayEventIsSending();
+				ihm.displayEventIsSending();
 				Date current_date = new Date();
 				socketEvent = new Socket(IP_SERVER, 3615);
 				DataOutputStream dos = new DataOutputStream(socketEvent.getOutputStream());
@@ -66,10 +69,10 @@ public abstract class Watcher extends Thread {
 				socketEvent.close();
 			} catch (UnknownHostException e) {
 				// Si on n'arrive pas à joindre l'host alors on le fait savoir à l'IHM etudiante
-				UASurveillanceIHMEtud.Window.getInstance().setErreur_connexion_serveur("Impossible de se connecter à " + Watcher.IP_SERVER + ". Vérifier l'adresse IP.");
+				ihm.setErreur_connexion_serveur("Impossible de se connecter à " + Watcher.IP_SERVER + ". Vérifier l'adresse IP.");
 			} catch (IOException e) {
 				// S'il y a une erreur, on le fait savoir
-				UASurveillanceIHMEtud.Window.getInstance().setErreur_connexion_serveur(e.getMessage() + " IP: "+ Watcher.IP_SERVER );
+				ihm.setErreur_connexion_serveur(e.getMessage() + " IP: "+ Watcher.IP_SERVER );
 			}
 		}
 	}
@@ -98,10 +101,10 @@ public abstract class Watcher extends Thread {
 			}
 		} catch (UnknownHostException e) {
 			// Si on n'arrive pas à joindre l'host alors on le fait savoir à l'IHM etudiante
-			UASurveillanceIHMEtud.Window.getInstance().setErreur_connexion_serveur("Impossible de se connecter à " + Watcher.IP_SERVER + ". Vérifier l'adresse IP.");
+			ihm.setErreur_connexion_serveur("Impossible de se connecter à " + Watcher.IP_SERVER + ". Vérifier l'adresse IP.");
 		} catch (IOException e) {
 			// S'il y a une erreur, on le fait savoir
-			UASurveillanceIHMEtud.Window.getInstance().setErreur_connexion_serveur(e.getMessage() + " IP: "+ Watcher.IP_SERVER );
+			ihm.setErreur_connexion_serveur(e.getMessage() + " IP: "+ Watcher.IP_SERVER );
 		}
 	}
 	

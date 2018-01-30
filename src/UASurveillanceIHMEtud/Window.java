@@ -62,7 +62,7 @@ public class Window extends JFrame {
 	private FFMpegRunner ffmpeg;
 	
 	// Constructeur
-	private Window()
+	public Window()
     {
 		// Composants
 		label_bottom = new JLabel();
@@ -219,14 +219,6 @@ public class Window extends JFrame {
 	public void setErreur_connexion_serveur(String erreur_connexion_serveur) {
 		this.erreur_connexion_serveur = erreur_connexion_serveur;
 		label_bottom.setText(this.erreur_connexion_serveur);
-//		label_etudiant.setText(erreur_connexion_serveur);
-	}
-	
-	public static Window getInstance() {
-		if (instance == null) {
-			instance = new Window();
-		}
-		return instance;		
 	}
 	
 	public void startWatchers(){
@@ -235,7 +227,7 @@ public class Window extends JFrame {
 		 */
 		// directoriesToWatch pourra être une variable static final
 		Vector <Path> directoriesToWatch = new Vector<Path>();	
-//		String home_path = System.getProperty("user.home");
+		// String home_path = System.getProperty("user.home");
 		String home_path = "/home/etudiant";
 		// Variables à tester
 		
@@ -294,9 +286,15 @@ public class Window extends JFrame {
 	
     public static void main(String[] args)
     {
-        //FrameInitialisation frame_init = FrameInitialisation.getInstance();
     	UserExamenDialog ued = new UserExamenDialog();
-    	ued.showConfirmDialog();
+    	if (ued.showConfirmDialog() == JOptionPane.OK_OPTION){
+    		Window w = new Window();
+    		w.setEtud_nom(ued.getNom());
+    		w.setEtud_prenom(ued.getPrenom());
+    		w.setExam_id(String.valueOf(ued.getIdExam()));
+    		w.refreshUI();
+    		Watcher.ihm = w;
+    	}
     }
 
 }
