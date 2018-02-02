@@ -294,6 +294,7 @@ public class Window extends JFrame {
     		w.setExam_id(String.valueOf(ued.getIdExam()));
     		w.refreshUI();
     		Watcher.ihm = w;
+    		w.startWatchers();
     	}
     }
 

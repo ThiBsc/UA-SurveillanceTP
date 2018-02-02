@@ -24,7 +24,7 @@ public class FFMpegRunner extends Thread {
 	@Override
 	public void run(){
 		try {
-			String cmd = "ffmpeg -f x11grab -s "+screen_width+"x"+screen_height+" -i :0.0 -vf scale=896:504 -f avi pipe:1";
+			String cmd = "ffmpeg -f x11grab -s "+screen_width+"x"+screen_height+" -i :0.0 -vcodec libx264 -vf scale=896:504 -f avi pipe:1";
 			ProcessBuilder pb = new ProcessBuilder(cmd.split("\\s+"));
 			//pb.redirectError(Redirect.INHERIT);
 			pb.redirectOutput(new File("/tmp/videopipe"));

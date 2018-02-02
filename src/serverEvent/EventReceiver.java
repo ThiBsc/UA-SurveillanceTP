@@ -88,14 +88,14 @@ public class EventReceiver extends Thread {
 						String VIDEO_PATH_nom = video_path+exam_id+"_"+nom+"_"+prenom;
 						if (line.contains("MOVIE_DURATION")){
 							String other = tabLine[5];
-							String duration = tabLine[1];
+							String duration = other.split(";")[1];
 							// ffmpeg -i tonfichier.avi -t 0:00:19.41 -c:v copy -c:a copy -c:s copy out.mp4
-							ProcessBuilder pb = new ProcessBuilder(String.format("ffmpeg -i %s -t %s -c:v copy -c:a copy -c:s copy %s",
-									VIDEO_PATH_nom+"_tmp.avi", duration, VIDEO_PATH_nom+".avi").split("\\s+"));
+							ProcessBuilder pb = new ProcessBuilder(String.format("ffmpeg -i %s -t %s -f mp4 -vcodec libx264 %s",
+									VIDEO_PATH_nom+"_tmp.avi", duration, VIDEO_PATH_nom+".mp4").split("\\s+"));
 							Process finaliser = pb.start();
 							try {
 								finaliser.waitFor();
-								System.out.println(type+" - "+VIDEO_PATH_nom+".avi is finalized with a time of "+duration);
+								System.out.println(type+" - "+VIDEO_PATH_nom+".mp4 is finalized with a time of "+duration);
 								File f = new File(VIDEO_PATH_nom+"_tmp.avi");
 								f.delete();
 							} catch (InterruptedException e) {
