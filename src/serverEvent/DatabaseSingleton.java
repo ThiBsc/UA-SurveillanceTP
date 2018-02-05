@@ -47,7 +47,7 @@ public class DatabaseSingleton {
 	 * @return le ResultSet de la requête
 	 * @throws SQLException
 	 */
-	public ResultSet query(String sql) throws SQLException{
+	public synchronized ResultSet query(String sql) throws SQLException{
 		stmt = connect.createStatement();
 		ResultSet ret = stmt.executeQuery(sql);
 		stmt.close();
@@ -60,7 +60,7 @@ public class DatabaseSingleton {
 	 * @return TRUE si l'update a fonctionné, sinon FALSE
 	 * @throws SQLException
 	 */
-	public boolean insert(String sql) throws SQLException{
+	public synchronized boolean insert(String sql) throws SQLException{
 		boolean ret = false;
 		stmt = connect.createStatement();
 		ret = stmt.executeUpdate(sql) != 0 ? true : false;
