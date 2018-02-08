@@ -1,0 +1,59 @@
+/* Set height of body and the document to 100% to enable "full page tabs" */
+html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-family: Arial;
+}
+
+
+
+form {
+  padding: 20px;
+}
+
+section {
+  display: flex;
+  flex-direction: row;
+  height: 90vh;
+}
+
+section column {
+  display: flex;
+  flex-direction: column;
+  flex: 0.5;
+  
+}
+  
+section column:nth-child(2) {
+  flex: 1;
+}
+
+section column div {
+ flex: 1;
+ margin: 10px;
+ border: 1px solid black;
+ overflow: auto;
+}
+
+div#video { 
+  display: flex;
+  flex-direction: row;
+  /* background: red; */
+}
+div#video video {
+  display: flex;
+  width: 60%;
+  background: black;
+}
+#listesuspecte {
+  display: flex;
+  
+  
+}
+
