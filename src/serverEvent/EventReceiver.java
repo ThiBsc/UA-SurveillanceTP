@@ -1,13 +1,17 @@
 package serverEvent;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 import java.util.Vector;
 
 /**
@@ -20,27 +24,36 @@ public class EventReceiver extends Thread {
 	 */
 	private ServerSocket ss;
 	private boolean running;
-	public static Vector<String> blackList;
+	public static Vector<String> blackList = new Vector<String>();
 	public static String video_path = "";
 
 	public EventReceiver(){
-		blackList = new Vector<String>();
 		running = false;
 	}
-	
+
 	@Override
 	public void run() {
 		DatabaseSingleton bdd = DatabaseSingleton.getInstance();
-		System.out.println("EventReceiver is waiting for suspicious event...");
 		// prepare
 		try {
 			bdd.connect("127.0.0.1", "UA-user", "ua_surveillance", "ua-user");
-			ResultSet rset = bdd.query("select path from VIDEO_PATH where nom like \"Test\";");
-			rset.next();
-			video_path = rset.getString("path");
+			ResultSet rset = bdd.query("select nom, path from VIDEO_PATH;");
+			System.out.println("Choose where to save the movie");
+			Vector<String> paths = new Vector<String>();
+			int idx = 0;
+			while (rset.next()){
+				System.out.println(idx++ +". "+rset.getString("nom")+": "+rset.getString("path"));
+				paths.add(rset.getString("path"));
+			}
+			idx = 0;
+			Scanner sc = new Scanner(System.in);
+			idx = sc.nextInt();
+			video_path = paths.get(idx);
+			sc.close();
 			rset.close();
 			ss = new ServerSocket(3615);
 			running = true;
+			System.out.println("EventReceiver is waiting for suspicious event...");
 		} catch (SQLException | ClassNotFoundException e) {
 			System.err.println(e.getMessage());
 		} catch (IOException e) {
@@ -78,13 +91,21 @@ public class EventReceiver extends Thread {
 	public void stopRunning() {
 		this.running = false;
 	}
-	
+
 	public static void main(String[] args) {
-		// String blacklistFile = args[0];
-		
 		EventReceiver ea = new EventReceiver();
-		ea.blackList.add("docs google");
-		ea.blackList.add("facebook");
+		if (args.length != 0){
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(args[0]));
+				String line = "";
+				while ( (line = br.readLine()) != null) {
+					EventReceiver.blackList.add(line);
+				}
+				br.close();
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+			}
+		}
 		ea.start();
 	}
 

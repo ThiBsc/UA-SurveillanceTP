@@ -18,8 +18,6 @@ import javax.swing.JPanel;
 
 import UASurveillanceEngine.DirectoryWatcher;
 import UASurveillanceEngine.FFMpegRunner;
-import UASurveillanceEngine.NetworkWatcherHistoryChrome;
-import UASurveillanceEngine.NetworkWatcherHistoryMozilla;
 import UASurveillanceEngine.NetworkWatcherTCP;
 import UASurveillanceEngine.ScreenWatcher;
 import UASurveillanceEngine.USBWatcher;
@@ -49,6 +47,7 @@ public class Window extends JFrame {
 	private String etud_nom;
 	private String etud_prenom;
 	private String exam_id;
+	private String srv_ip;
 
 	// Components
 	private JLabel label_bottom;
@@ -216,6 +215,15 @@ public class Window extends JFrame {
 		
 	}
 
+	public String getSrv_ip() {
+		return srv_ip;
+	}
+
+	public void setSrv_ip(String srv_ip) {
+		Watcher.IP_SERVER = srv_ip;
+		this.srv_ip = srv_ip;
+	}
+
 	public void setErreur_connexion_serveur(String erreur_connexion_serveur) {
 		this.erreur_connexion_serveur = erreur_connexion_serveur;
 		label_bottom.setText(this.erreur_connexion_serveur);
@@ -233,7 +241,6 @@ public class Window extends JFrame {
 		
 		// Pour tester j'ai mis le dossier du projet et celui de téléchargement
 		directoriesToWatch.add( Paths.get(home_path) );
-		DirectoryWatcher dw = null;
 		try {
 			watchers.add(new DirectoryWatcher(directoriesToWatch));
 		} catch (IOException e) {
@@ -242,8 +249,6 @@ public class Window extends JFrame {
 		/**
 		 * NetworkWatcher
 		 */
-		watchers.add(new NetworkWatcherHistoryChrome(home_path + "/.config/google-chrome/Default/History"));
-		watchers.add(new NetworkWatcherHistoryMozilla(home_path + "/.mozilla/firefox/ugm37j7z.default-1462882570889/places.sqlite"));
 		watchers.add(new NetworkWatcherTCP());
 		/**
 		 * USBWatcher
@@ -292,6 +297,7 @@ public class Window extends JFrame {
     		w.setEtud_nom(ued.getNom());
     		w.setEtud_prenom(ued.getPrenom());
     		w.setExam_id(String.valueOf(ued.getIdExam()));
+    		w.setSrv_ip(ued.getIp());
     		w.refreshUI();
     		Watcher.ihm = w;
     		w.startWatchers();

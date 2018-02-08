@@ -2,25 +2,79 @@
 Projet surveillance de séance de TP
 
 # Installation
-### Les librairies à importer
-* [Maria-DB](https://downloads.mariadb.com/Connectors/java/connector-java-2.2.0/mariadb-java-client-2.2.0.jar)
-* [Sqlite](https://bitbucket.org/xerial/sqlite-jdbc/downloads/sqlite-jdbc-3.21.0.jar)
-* Icons - www.aha-soft.com
+## Partie enseignant
+### Programme serveur
+Compiler un .jar du serveur (driver jdbc [Maria-DB](https://downloads.mariadb.org/connector-java/2.2.1/))  
+Le main se trouve dans serverEvent.EventReceiver
+```shell
+# pour le lancer
+java -jar server.jar blacklist.txt
+# il demande ensuite ou sauvgarder les vidéos
+0. Default: /var/www/html/ua_surveillance/
+1. Test: /tmp/
+# le fichier blacklist.txt est un fichier contenant les
+# sites déclenchant un évènement suspect de la forme:
+docs.google
+facebook
+...
+```
+### Interface de visualisation
+* Installer un serveur Apache
+* Mettre les fichiers du dossier *web_interface* sur le serveur
 
+### Configuration
+Dans la base de données, pour que le site puisse correctement afficher les vidéos, penser à préciser un chemin accessible depuis le serveur Apache dans la table VIDEO_PATH, ex:
+```sql
+update VIDEO_PATH
+set path = "/var/www/html/ua_surveillance/movie"
+where nom like "Default";
+```
+
+## Partie étudiant
 ### Processus à installer
-* [ffmpeg](apt://ffmpeg) - enregistrement vidéo
+```shell
+# pour l'enregistrement vidéo
+sudo apt install ffmpeg
+# pour la surveillance du réseau
+sudo apt install tcpdump
 ```
-sudo add-apt-repository ppa:mc3man/trusty-media
-sudo apt-get update
-sudo apt-get install ffmpeg
-sudo add-apt-repository -r ppa:mc3man/trusty-media
+Compiler un .jar du client  
+Le main se trouve dans UASurveillanceIHMEtud.Window
+```shell
+# pour le lancer
+sudo java -jar client.jar
+# le sudo est nécessaire pour l'écoute réseau,
+# s'il est lancé sans, il fonctionnera sans écouter le réseau.
+...
 ```
-* [tcpdump](https://doc.ubuntu-fr.org/trafic) - écoute du réseau
+
+## Le protocole
+Pour communiquer, le client envoie des chaines de caractères de la forme:
+```java
+"TYPE|exam_id|etu_nom|etu_prenom|date|(?other)"
 ```
-sudo apt-get install tcpdump
+* TYPE: [SCREEN|NETWORK|USB|DIRECTORY]
+* exam_id: Sur quel examen enregistrer l'évènemment
+* etu_(pre)nom: Le (pre)nom de l'étudiant ayant déclencher l'évènemment
+* date: La date ou l'évènement à été déclenché
+* other (facultatif): Un information supplémentaire sur l'évènement
+
+Si le serveur reçoit une chaine qui:
+* N'a pas le bon nombre de pipe, il affichera:
+```java
+"Invalid parameters."
+```
+* A un TYPE non prévu, il affichera:
+```java
+"Protocol not recognized."
 ```
 
 ### Initialisation de la base de données
-Il faut préalablement créer un utilisateur 'UA-user' avec le mdp 'ua-user' (ces informations ne sont pas secrètes, elles sont dans le code, à vous de les changer si vous souhaitez sécuriser votre application).
+Il faut préalablement créer un utilisateur 'UA-user' avec le mdp 'ua-user' (ces informations ne sont pas secrètes, elles sont dans le code, à vous de les changer si vous souhaitez sécuriser votre application).  
 
-Le dump de la base de données après la soutenance est disponible à la racine du projet dans le fichier "ua_surveillance.sql"
+Les étudiants n'ont pas besoin d'avoir les identifiants de la bdd pour faire fonctionner le programme.
+
+Le dump de la base de données est disponible à la racine du projet dans le fichier "ua_surveillance.sql"
+
+### Crédits
+Icons - www.aha-soft.com
