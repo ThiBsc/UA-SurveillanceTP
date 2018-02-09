@@ -75,6 +75,10 @@ Il faut préalablement créer un utilisateur 'UA-user' avec le mdp 'ua-user' (ce
 Les étudiants n'ont pas besoin d'avoir les identifiants de la bdd pour faire fonctionner le programme.
 
 Le dump de la base de données est disponible à la racine du projet dans le fichier "ua_surveillance.sql"
+```shell
+# importer le dump
+mysql -u UA-user -D ua_surveillance -p < ua_surveillance.sql
+```
 
 ### Crédits
 Icons - www.aha-soft.com
