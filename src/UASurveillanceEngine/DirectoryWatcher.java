@@ -10,8 +10,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -38,6 +40,7 @@ public class DirectoryWatcher extends Watcher {
 	 * Le changement de taille autorisé entre deux enregistrements de fichier en bytes
 	 */
 	public static long AUTHORIZED_FILE_SIZE_CHANGE = 256;
+	public static int DEEP_WATCH_LEVEL = 7;
 	
 	private static final String ALERT_SUSPECT_SAVED = "/!\\ ALERT_SUSPECT_SAVED: %s vient d'augmenter la taille du fichier %s de %d bytes.\n";
 	
@@ -51,12 +54,11 @@ public class DirectoryWatcher extends Watcher {
 	 * La liste des dossiers à watcher
 	 */
 	private Vector<Path> directoryList;
-	 
+	
 	/**
-	 * ===========================================================================
-	 * Constructeur
-	 * ===========================================================================
+	 * La liste des fichiers modifiés avec leur dernière taille
 	 */
+	private HashMap<String, Long> lastModifs;
     
 	/**
 	 * Default constructor
@@ -67,10 +69,12 @@ public class DirectoryWatcher extends Watcher {
 		this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<WatchKey, Path>();
         this.directoryList = directories;
+        this.lastModifs = new HashMap<String, Long>();
         
         // Pour chaque dossier on parcourt les sous dossiers et on les watch
         for (int i=0; i < this.directoryList.size(); i++) {
-        	walkAndRegisterDirectories(this.directoryList.get(i)); 
+        	if ( !(new File(directoryList.get(i).toString()).isHidden()))
+        		walkAndRegisterDirectories(this.directoryList.get(i)); 
         }
         
 	}
@@ -108,9 +112,8 @@ public class DirectoryWatcher extends Watcher {
      * @param dir
      * @throws IOException
      */
-    private void registerDirectory(Path dir) throws IOException
-    {
-        WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+    private void registerDirectory(Path dir) throws IOException {
+        WatchKey key = dir.register(watcher, /*ENTRY_CREATE, ENTRY_DELETE,*/ ENTRY_MODIFY);
         this.keys.put(key, dir);
     }
  
@@ -122,11 +125,50 @@ public class DirectoryWatcher extends Watcher {
     private void walkAndRegisterDirectories(final Path start) throws IOException {
         // register directory and sub-directories
         Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                registerDirectory(dir);
-                return FileVisitResult.CONTINUE;
-            }
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path arg0,
+					IOException arg1) throws IOException {
+				return super.postVisitDirectory(arg0, arg1);
+			}
+
+			@Override
+			public FileVisitResult preVisitDirectory(Path arg0,
+					BasicFileAttributes arg1) throws IOException {
+				FileVisitResult ret = FileVisitResult.CONTINUE;
+				if (arg1.isDirectory()){
+					File dir = arg0.toFile();
+					ret = dir.canRead() && !dir.isHidden() ? FileVisitResult.CONTINUE : FileVisitResult.SKIP_SUBTREE;
+					// Si rien ne l'empeche et si on est pas à plus de 5 niveau de profondeur, on le regarde
+					if (ret == FileVisitResult.CONTINUE && arg0.toString().split("/").length < DEEP_WATCH_LEVEL)
+						registerDirectory(arg0);
+				}
+				return ret;
+			}
+
+			@Override
+			public FileVisitResult visitFile(Path arg0, BasicFileAttributes arg1)
+					throws IOException {
+				FileVisitResult ret = FileVisitResult.CONTINUE;
+				if (arg1.isDirectory()){
+					File dir = arg0.toFile();
+					ret = dir.canRead() && !dir.isHidden() ? FileVisitResult.CONTINUE : FileVisitResult.SKIP_SUBTREE;
+				}
+				return ret;
+			}
+
+			@Override
+			public FileVisitResult visitFileFailed(Path arg0, IOException arg1)
+					throws IOException {
+				FileVisitResult ret = FileVisitResult.CONTINUE;
+				File f = arg0.toFile();
+				if (f.isDirectory()){
+					ret = f.canRead() && !f.isHidden() ? FileVisitResult.CONTINUE : FileVisitResult.SKIP_SUBTREE;
+				}
+				// System.out.println("visitFileFailed, "+arg0+ret);
+				return ret;
+			}
+        	
         });
     }
     
@@ -139,23 +181,15 @@ public class DirectoryWatcher extends Watcher {
      * @return
      */
     private long sizeFileDifference(String type, Path fullPath, Long size, String time) {
-    	
+    	long difference = 0;
     	// On récupère le dernier enregistrement du fichier
-    	
-    	// Si le fichier est enregistré dans notre "bdd" on renvoie la différence de taille entre les deux
-    	 
+    	if (lastModifs.containsKey(fullPath.toString())){
+    		difference = size - lastModifs.get(fullPath.toString());
+    	} else {
+    		lastModifs.put(fullPath.toString(), size);
+    	}    	 
     	// Si le fichier n'est pas enregistré on renvoie 0
-    	return 0;
-    }
-
-    /**
-     * Déclenchement d'une alerte de comportement suspect
-     * @param hostname
-     * @param fullpath
-     * @param sizeDifference
-     */
-    private void launchAlert(String hostname, Path fullpath, long sizeDifference) {
-    	System.out.printf(ALERT_SUSPECT_SAVED, hostname, fullpath.toString(), sizeDifference);
+    	return difference;
     }
     
     /**
@@ -197,25 +231,11 @@ public class DirectoryWatcher extends Watcher {
                 /* Avec la méthodes Files.isHidden() on voit directement si le fichier est un fichier caché ou pas.
                  * Il faut ensuite traité le path du fichier pour voir s'il est pas dans un dossier caché.
                  */
-                File file = new File(child.toString());
+                File file = child.toFile();
                 Date date_event = new Date();
                 
-                String path_fichier = new String(file.getPath());
-                String[] etape_path = path_fichier.split("/");
-                boolean is_hidden = false;
-                
-                // On regarde si le fichier est caché (= le nom commence par un point)
-                for(int i=0; i<etape_path.length; i++){
-                	if(etape_path[i].length() > 0){
-	                	if(etape_path[i].charAt(0) == '.'){
-	                		is_hidden = true;
-	                		break;
-	                	}
-                	}
-                }
-                
                 // Le fichier n'est pas caché, on le traite
-                if( ! is_hidden){
+                if( !file.isHidden()){
                 	
                 	String type = event.kind().name();
                 	Path fullPath = child;
@@ -228,27 +248,12 @@ public class DirectoryWatcher extends Watcher {
                 	// Si on détecte un gros changement, on alerte
                 	long sizeFileDifference = sizeFileDifference(type, fullPath, size, time);
                 	if ( sizeFileDifference > AUTHORIZED_FILE_SIZE_CHANGE) {
-                		
-                		// On lance une alerte au serveur avec le nom de la machine qui vient de faire un enregistrement suspect
-                		String hostname;
-                		try {
-                			hostname = InetAddress.getLocalHost().getHostName();
-						} catch (UnknownHostException e) { 
-							hostname = "(errorHostName)";
-						}
-						launchAlert(hostname, fullPath, sizeFileDifference);
-						
+	                	// Le changement est trop grand donc suspect
+	                	String delimiter = ";";
+	                	String info_changes_text = type + delimiter	+ sizeFileDifference;
+	                	//System.out.println(info_changes_text);
+	            		sendEvent(info_changes_text);
                 	}
-                	
-                	// Dans tous les cas, on envoit le changement
-                	String delimiter = ";";
-                	String info_changes_text =
-                			type + delimiter
-                			+ fullPath + delimiter
-                			+ size;
-                	
-            		sendEvent(info_changes_text);
-                	
                 }     
                 /*======================================================================================================*/
                 
@@ -276,5 +281,4 @@ public class DirectoryWatcher extends Watcher {
             }
         }
 	}
-
 }
