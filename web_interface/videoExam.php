@@ -11,15 +11,15 @@ if (isset($_GET["exam_id"]) && isset($_GET["nom"]) && isset($_GET["prenom"])) {
     $video_path = $conn->query("SELECT path FROM EXAMEN_has_VIDEO_PATH join VIDEO_PATH on (EXAMEN_has_VIDEO_PATH.VIDEO_PATH_nom=VIDEO_PATH.nom) WHERE EXAMEN_id = $exam_id AND etu_nom='$nom' AND etu_prenom='$prenom'  ")->fetch();
 
     //$path=$video_path[0];
-    $path="/tmp/";
+    $path="/tmp/"; // TODO Verifier que ça marche sur le server
     $video=$exam_id."_".$nom."_".$prenom.".mp4";
     echo "<video id='vid_exam' preload='metadata'  controls><source src=\"$path$video\" type=\"video/mp4\">La vidéo est inexistante.</video>";
 
    
 
     // recupereation des evenements suspects de l'etudiant
-    $events = $conn->query("select EVENEMENT_type, other, timestampdiff(SECOND, create_date, date) as event_time_in_video from EXAMEN_has_EVENEMENT E join EXAMEN_has_VIDEO_PATH V on (E.etu_nom=V.etu_nom and E.etu_prenom=V.etu_prenom) WHERE E.EXAMEN_id = $exam_id AND E.etu_nom = '$nom' AND  E.etu_prenom = '$prenom'");
-    echo "<table id ='listesuspecte' class=\"table table-striped table-hover\">";
+    $events = $conn->query("select EVENEMENT_type, other, timestampdiff(SECOND, create_date, date) as event_time_in_video from EXAMEN_has_EVENEMENT E join EXAMEN_has_VIDEO_PATH V on (E.EXAMEN_id=V.EXAMEN_id and E.etu_nom=V.etu_nom and E.etu_prenom=V.etu_prenom) WHERE E.EXAMEN_id = $exam_id AND E.etu_nom = '$nom' AND  E.etu_prenom = '$prenom'");
+    echo "<div><table id ='listesuspecte' class=\"table table-striped table-hover\">";
     echo "<tr><th>Type</th><th>Moment</th></tr>";
     foreach($events as $row) {
         echo "<tr onclick=\"setCurTime(".$row["event_time_in_video"].")\">";
@@ -29,7 +29,7 @@ if (isset($_GET["exam_id"]) && isset($_GET["nom"]) && isset($_GET["prenom"])) {
         echo "<td>$min:$sec</td>";
         echo "</tr>";
     }
-    echo "</table>";
+    echo "</table></div>";
 
 }
 else {
