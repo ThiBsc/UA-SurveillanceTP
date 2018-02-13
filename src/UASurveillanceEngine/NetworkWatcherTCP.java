@@ -33,7 +33,7 @@ public class NetworkWatcherTCP extends NetworkWatcher {
 		String tcpdumpCmdResponse = "";
 		ProcessBuilder constructionProcess = null;
 		
-		constructionProcess = new ProcessBuilder("tcpdump","-c 25","udp", "-tttt");
+		constructionProcess = new ProcessBuilder("tcpdump","-c 25","udp", "-tttt", "-i any");
 		
  
 		constructionProcess.redirectErrorStream(true);

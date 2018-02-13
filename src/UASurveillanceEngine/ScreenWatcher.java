@@ -43,19 +43,26 @@ public class ScreenWatcher extends Watcher {
 				isRecording = true;
 				while  (isRecording){
 					try {
-						if (fis.available() != 0){
+						if (fis.available() > 2048){
 							int size_available = fis.available();
 							byte[] data = new byte[size_available];
 							fis.read(data, 0, size_available);
-							//fos.write(data);
-							//System.out.println(new String(data));
-							// envoie au server
-							//Socket socketEvent = new Socket("172.29.116.105", 3615);
 							sendEventData(size_available, data);
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				}
+				// on envoie tout ce qui reste
+				try {
+					if (fis.available() != 0){
+						int size_available = fis.available();
+						byte[] data = new byte[size_available];
+						fis.read(data, 0, size_available);
+						sendEventData(size_available, data);
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
 				try {
 					fis.close();
