@@ -16,21 +16,20 @@
 	 </head>
 
 	 <body>
-	 	<nav class="navbar navbar-inverse">
+	 	<nav class="navbar navbar-inverse bg-primary">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="#">Surveillance de tp</a>
+					<a class="navbar-brand" href="#">Surveillance de TP</a>
 				</div>
 				<ul class="nav navbar-nav">
-					<li class="active"><a href="index.php">Accueil</a></li>
-					<li><a href="ajout.php">Ajout</a></li>
-					<li><a href="#contact">Contact</a></li>
-					<li><a href="#propos">A propos</a></li>
+					<li class="active"><a href="index.php">Page Principale</a></li>
+					<li><a href="ajout.php">Ajouter un Examen</a></li>
+					<li><a href="apropos.php">A propos</a></li>
 				</ul>
-				<ul class="nav navbar-nav navbar-right">
+				<!-- <ul class="nav navbar-nav navbar-right">
 					<li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
 					<li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-				</ul>
+				</ul> -->
 			</div>
 		</nav> 
 
@@ -41,10 +40,11 @@
 					include_once("connect.php");
 					$listeExam = $conn->query("SELECT * FROM EXAMEN ORDER BY date");
 					echo "<table  class=\"table table-striped table-hover\">";
-					echo "<tr><th>ID</th><th>Date</th><th>Enseignant</th><th>Matière</th><th>Promotion</th></tr>";
+					echo "<tr><th><span class=\"glyphicon\">&#xe020;</span></th><th>ID</th><th>Date</th><th>Enseignant</th><th>Matière</th><th>Promotion</th></tr>";
 					foreach ($listeExam as $row) {
 						$id = $row["id"];
 						echo "<tr onclick=\"executeScript('etudiantsExam.php?exam_id=$id', afficherEtudiants)\">";
+						echo"<td><a href=\"suppExam.php?exam_id=$id\"> <span class=\"glyphicon glyphicon-trash\"></span></a></td>";
 						echo "<td>" . $row["id"] . "</td>";
 						echo "<td>" . date("m/d", $row["date"]) . "</td>";
 					
@@ -67,7 +67,6 @@
 				</div>
 
 				<div id = "etudiantsliste" >
-					2
 				</div>
 			</column>
 			

@@ -49,3 +49,6 @@ function setCurTime(second) {
     console.log(vid);
     vid.currentTime=second;
 }
+function afficherReadme(contenu) {
+    document.querySelector("readme").innerHTML=contenu;
+   }

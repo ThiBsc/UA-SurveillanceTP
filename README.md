@@ -1,5 +1,5 @@
 # UA-SurveillanceTP
-Projet surveillance de séance de TP
+Projet de surveillance de séances de TP
 
 # Installation
 ## Partie enseignant
@@ -60,7 +60,7 @@ Pour communiquer, le client envoie des chaines de caractères de la forme:
 * other (facultatif): Un information supplémentaire sur l'évènement
 
 Si le serveur reçoit une chaine qui:
-* N'a pas le bon nombre de pipe, il affichera:
+* N'a pas le bon nombre de pipes, il affichera:
 ```java
 "Invalid parameters."
 ```
@@ -70,7 +70,7 @@ Si le serveur reçoit une chaine qui:
 ```
 
 ### Initialisation de la base de données
-Il faut préalablement créer un utilisateur 'UA-user' avec le mdp 'ua-user' (ces informations ne sont pas secrètes, elles sont dans le code, à vous de les changer si vous souhaitez sécuriser votre application).  
+Il faut préalablement créer un utilisateur 'UA-user' avec le mot de passe 'ua-user' (ces informations ne sont pas secrètes, elles sont dans le code, à vous de les changer si vous souhaitez sécuriser votre application).  
 
 Les étudiants n'ont pas besoin d'avoir les identifiants de la bdd pour faire fonctionner le programme.
 
